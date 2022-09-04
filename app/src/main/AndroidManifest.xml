@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.apetta.detext_app">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-permission
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.NoActionBar">
+        <activity
+            android:name=".navmenu.detection.CameraXActivity"
+            android:exported="false" />
+        <activity
+            android:name=".navmenu.detection.CaptureVideoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".navmenu.account.DetailsOfCardHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".navmenu.account.HistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".alertDialogs.TemperatureAlertDialog"
+            android:exported="false" />
+        <activity
+            android:name=".navmenu.NavMenu"
+            android:exported="false" />
+        <activity
+            android:name=".navmenu.detection.ImageResultsActivity"
+            android:exported="false" /> <!-- android:theme="@style/Theme.DeTEXTApp" -->
+        <activity
+            android:name=".login.SignInActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".login.SignUpActivity"
+            android:exported="false"
+            android:parentActivityName=".login.SignInActivity"
+            android:windowSoftInputMode="adjustResize" /> <!-- <activity -->
+        <!-- android:name=".DetectMainActivity" -->
+        <!-- android:exported="false" /> -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="ocr" />
+    </application>
+
+</manifest>

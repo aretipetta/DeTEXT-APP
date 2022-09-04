@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "160855741002",
+    "project_id": "detext-app",
+    "storage_bucket": "detext-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:160855741002:android:71a3e56dc5a40cf824ccb3",
+        "android_client_info": {
+          "package_name": "com.apetta.detext_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "160855741002-rgs5so4046048ltc5l2147icc0teng9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAh5sgvcz7dSmf1MyWCXZQoggSQrkMLPqM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "160855741002-rgs5so4046048ltc5l2147icc0teng9c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

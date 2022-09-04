@@ -1,0 +1,184 @@
+[
+  {
+    "level_": 0,
+    "message_": "Start JSON generation. Platform version: 21 min SDK version: armeabi-v7a",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 165315605
+  },
+  {
+    "level_": 0,
+    "message_": "rebuilding JSON C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\\android_gradle_build.json due to:",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1968020799
+  },
+  {
+    "level_": 0,
+    "message_": "- expected json C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\\android_gradle_build.json file is not present, will remove stale json folder",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1812639697
+  },
+  {
+    "level_": 0,
+    "message_": "- missing previous command file C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\\metadata_generation_command.txt, will remove stale json folder",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1032442639
+  },
+  {
+    "level_": 0,
+    "message_": "- command changed from previous, will remove stale json folder",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -964803195
+  },
+  {
+    "level_": 0,
+    "message_": "removing stale contents from \u0027C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\u0027",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 324178701
+  },
+  {
+    "level_": 0,
+    "message_": "created folder \u0027C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\u0027",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1034527103
+  },
+  {
+    "level_": 0,
+    "message_": "executing cmake Executable : C:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\cmake.exe\narguments : \n-HC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_SYSTEM_VERSION\u003d21\n-DANDROID_PLATFORM\u003dandroid-21\n-DANDROID_ABI\u003darmeabi-v7a\n-DCMAKE_ANDROID_ARCH_ABI\u003darmeabi-v7a\n-DANDROID_NDK\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_ANDROID_NDK\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\\build\\cmake\\android.toolchain.cmake\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\ninja.exe\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\build\\intermediates\\cxx\\Debug\\216r462b\\obj\\armeabi-v7a\n-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003dC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\build\\intermediates\\cxx\\Debug\\216r462b\\obj\\armeabi-v7a\n-DCMAKE_BUILD_TYPE\u003dDebug\n-BC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\n-GNinja\n-DANDROID_STL\u003dc++_shared\njvmArgs : \n\n",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 603727013
+  },
+  {
+    "level_": 0,
+    "message_": "Executable : C:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\cmake.exe\narguments : \n-HC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_SYSTEM_VERSION\u003d21\n-DANDROID_PLATFORM\u003dandroid-21\n-DANDROID_ABI\u003darmeabi-v7a\n-DCMAKE_ANDROID_ARCH_ABI\u003darmeabi-v7a\n-DANDROID_NDK\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_ANDROID_NDK\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\\build\\cmake\\android.toolchain.cmake\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\areti\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\ninja.exe\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\build\\intermediates\\cxx\\Debug\\216r462b\\obj\\armeabi-v7a\n-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003dC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\build\\intermediates\\cxx\\Debug\\216r462b\\obj\\armeabi-v7a\n-DCMAKE_BUILD_TYPE\u003dDebug\n-BC:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\n-GNinja\n-DANDROID_STL\u003dc++_shared\njvmArgs : \n\n",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1631199708
+  },
+  {
+    "level_": 0,
+    "message_": "Exiting generation of C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\\compile_commands.json.bin normally",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -387462409
+  },
+  {
+    "level_": 0,
+    "message_": "done executing cmake",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1277149446
+  },
+  {
+    "level_": 0,
+    "message_": "write command file C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\.cxx\\Debug\\216r462b\\armeabi-v7a\\metadata_generation_command.txt",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 463597131
+  },
+  {
+    "level_": 0,
+    "message_": "JSON generation completed without problems",
+    "file_": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\libcxx_helper\\CMakeLists.txt",
+    "tag_": "debug|armeabi-v7a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 660923638
+  }
+]

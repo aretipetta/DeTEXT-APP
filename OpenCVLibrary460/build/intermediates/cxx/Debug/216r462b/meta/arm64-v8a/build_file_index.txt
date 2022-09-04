@@ -1,0 +1,1 @@
+C:\Users\areti\Documents\my_projects\projects\androidStudio\DeTEXTApp\OpenCVLibrary460\libcxx_helper\CMakeLists.txt

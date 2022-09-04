@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="supported_languages">
+        <item>af</item>
+        <item>sq</item>
+        <item>ca</item>
+        <item>hr</item>
+        <item>cs</item>
+        <item>da</item>
+        <item>nl</item>
+        <item>en</item>
+        <item>et</item>
+        <item>fil</item>
+        <item>tl</item>
+        <item>fi</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>hu</item>
+        <item>is</item>
+        <item>id</item>
+        <item>it</item>
+        <item>lv</item>
+        <item>lt</item>
+        <item>ms</item>
+        <item>mo</item>
+        <item>pl</item>
+        <item>pt</item>
+        <item>ro</item>
+        <item>sr-Latn</item>
+        <item>sk</item>
+        <item>sl</item>
+        <item>es</item>
+        <item>sv</item>
+        <item>tr</item>
+        <item>vi</item>
+    </string-array>
+</resources>
