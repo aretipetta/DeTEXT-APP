@@ -1,7 +1,17 @@
 package com.apetta.detext_app.navmenu.detection;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.apetta.detext_app.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import android.content.Context;
 import android.content.Intent;
@@ -88,23 +98,30 @@ public class CaptureVideoActivity extends CameraActivity {
                 Mat realMat = rotateFrame(inputFrame.rgba());   // rotate mat
                 // get bitmap from mat
                 Bitmap bitmap = matToBitmap(realMat);
+                getTextFromImage(getApplicationContext(), bitmap);
 
-                DetectImage detectImage = new DetectImage();
-                // bitmap to uri
-                Uri uri = bitmapToUri(getApplicationContext(), bitmap);
-                detectImage.extractTextFromImage(getApplicationContext(), uri);
-                boolean b = false;
+//                DetectImage detectImage = new DetectImage();
+//                // bitmap to uri
+////                Uri uri = bitmapToUri(getApplicationContext(), bitmap);
+////                detectImage.extractTextFromImage(getApplicationContext(), uri);
+//                detectImage.extractTextFromImage(getApplicationContext(), bitmap);
+
+//                boolean b = false;
 //                Toast.makeText(CaptureVideoActivity.this, "frame tade...", Toast.LENGTH_SHORT).show();
-                if(detectImage.getFoundText()) {
-                    // TODO: na stamataei kai na anoigei neo activity me to uri pou prepei na ftiaksei...
-//                    Toast.makeText(CaptureVideoActivity.this, "vrhke keimeno", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
-                    intent.setData(uri);
-                    b = true;
-                    startActivity(intent);
-                    finish();
-                }
-                if(!b) deleteFileByUri(uri);
+//                if(detectImage.getFoundText()) {
+//                    // TODO: na stamataei kai na anoigei neo activity me to uri pou prepei na ftiaksei...
+////                    Toast.makeText(CaptureVideoActivity.this, "vrhke keimeno", Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
+//                    ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+//                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+//                    byte[] byteArray = bStream.toByteArray();
+//                    intent.putExtra("bitmap", byteArray);
+////                    intent.setData(uri);
+//                    b = true;
+//                    startActivity(intent);
+//                    finish();
+//                }
+//                if(!b) deleteFileByUri(uri);
 
 //                runOnUiThread(new Runnable() {
 //                    @Override
@@ -160,6 +177,80 @@ public class CaptureVideoActivity extends CameraActivity {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         return Uri.parse(MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "tempFile", null));
     }
+
+
+
+
+
+
+
+
+    public void getTextFromImage(Context context, Bitmap bitmap) {
+        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+//        try {
+        // XRHSIMOOOOOOOOOO για text rec
+//            https://developers.google.com/ml-kit/vision/text-recognition/android#java
+        // identify language
+        // https://developers.google.com/ml-kit/language/identification/android
+        // gia translation
+        // https://developers.google.com/ml-kit/language/translation/android
+        /** TODO
+         * prwta vriskei to keimeno kai thn glwssa. An h glwssa einai egkurh prosthetei to block se mia lista.
+         * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
+         */
+
+//            InputImage inputImage = InputImage.fromFilePath(context, uri);
+        InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+        Task<Text> result = recognizer.process(inputImage)
+                .addOnCompleteListener(new OnCompleteListener<Text>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Text> task) {
+                        // kanei thn metafrash sthn onComplete...?
+                        if(task.getResult().getTextBlocks().size() > 0) {
+                            Log.d("ielaaa", "to brhke me bitmap kai size = " + task.getResult().getTextBlocks().size());
+                            Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
+                            ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+                            byte[] byteArray = bStream.toByteArray();
+                            intent.putExtra("bitmap", byteArray);
+//                    intent.setData(uri);
+                            startActivity(intent);
+                            finish();
+                        }
+//                        for(Text.TextBlock block : task.getResult().getTextBlocks()) {
+//                            textOfBlocks.add(block.getText());
+//                        }
+//                        // edw exei parei ola ta keimena opote epistrefei th lista
+////                            getIt = true;
+//                        if(textOfBlocks.size() > 0){
+//                            foundText = true;
+//                        }
+//                            if(textOfBlocks.size() > 0) translateText();
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<Text>() {
+                    @Override
+                    public void onSuccess(Text text) { }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) { }
+                });
+//        }
+//        catch (IOException e) { e.printStackTrace(); }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void deleteFileByUri(Uri uri) {
         getContentResolver().delete(uri, null, null);

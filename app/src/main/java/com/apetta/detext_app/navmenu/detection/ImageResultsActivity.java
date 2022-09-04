@@ -8,6 +8,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
@@ -58,6 +60,7 @@ public class ImageResultsActivity extends AppCompatActivity {
 
 
     Uri imgUri;
+    Bitmap imgBitmap;
     ArrayList<String> textOfBlocks;
     ArrayList<String> languageOfBlocks;
     ArrayList<String> translatedTexts;
@@ -106,9 +109,12 @@ public class ImageResultsActivity extends AppCompatActivity {
         twitterButton = findViewById(R.id.twitterButton);
         saveButton = findViewById(R.id.saveButton);
         img = findViewById(R.id.uploadedImg);
-        imgUri = getIntent().getData();
+        // get data from intent
+        byte[] byteArray = getIntent().getByteArrayExtra("bitmap");
+        imgBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+//        imgUri = getIntent().getData();
         img.setImageURI(imgUri);
-        extractTextFromImage(imgUri);
+        extractTextFromImage(imgBitmap);
         setListeners();
     }
 
@@ -245,15 +251,16 @@ public class ImageResultsActivity extends AppCompatActivity {
         });
     }
 
-    public void extractTextFromImage(Uri uri) {
+    public void extractTextFromImage(Bitmap bitmap) { // Uri uri
         textOfBlocks = new ArrayList<>();
         languageOfBlocks = new ArrayList<>();
         translatedTexts = new ArrayList<>();
 //        DetectImage detectImage = new DetectImage();
-//        detectImage.extractTextFromImage(this, uri);
+////        detectImage.extractTextFromImage(this, uri);
+//        detectImage.extractTextFromImage(this, bitmap);
 //        if(detectImage.getFoundText()) {
 //            detectImage.translateText();
-//            Log.d("ielaaa", "in extract... size = " + detectImage.getTextOfBlocks().size());
+//            Log.d("ielaaa", "in image result... size = " + detectImage.getTextOfBlocks().size());
 //            if(detectImage.isReady()) {
 //            textOfBlocks = detectImage.getTextOfBlocks();
 //            languageOfBlocks = detectImage.getLanguageOfBlocks();
@@ -268,7 +275,8 @@ public class ImageResultsActivity extends AppCompatActivity {
 
 
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        try {
+        // TODO: edw exw vgalei to try-catch epd den xreiazetai otan to inputImage exei bitmap anti gia uri
+//        try {
             // XRHSIMOOOOOOOOOO για text rec
 //            https://developers.google.com/ml-kit/vision/text-recognition/android#java
             // identify language
@@ -279,7 +287,8 @@ public class ImageResultsActivity extends AppCompatActivity {
              * prwta vriskei to keimeno kai thn glwssa. An h glwssa einai egkurh prosthetei to block se mia lista.
              * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
              */
-            InputImage inputImage = InputImage.fromFilePath(getApplicationContext(), uri);
+//            InputImage inputImage = InputImage.fromFilePath(getApplicationContext(), uri);
+            InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
             Task<Text> result = recognizer.process(inputImage)
                     .addOnCompleteListener(new OnCompleteListener<Text>() {
                         @Override
@@ -291,7 +300,10 @@ public class ImageResultsActivity extends AppCompatActivity {
                             for(Text.TextBlock block : task.getResult().getTextBlocks()) {
                                 textOfBlocks.add(block.getText());
                             }
-                            if(textOfBlocks.size() > 0) translateText();
+                            if(textOfBlocks.size() > 0) {
+                                Log.d("ielaaa", "sthn image result to vrhke me bitmap. palios kwdikas");
+                                translateText();
+                            }
 
 //                            translatedTexts = new ArrayList<>();
 //                            languageOfBlocks = new ArrayList<>();
@@ -346,10 +358,10 @@ public class ImageResultsActivity extends AppCompatActivity {
 //                            Toast.makeText(ImageResultsActivity.this, "Not found...", Toast.LENGTH_SHORT).show();
                         }
                     });
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
 

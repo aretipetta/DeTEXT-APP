@@ -46,7 +46,7 @@ public class CameraXActivity extends AppCompatActivity implements ImageAnalysis.
         DetectImage detectImage = new DetectImage();
         // bitmap to uri
         Uri uri = bitmapToUri(getApplicationContext(), previewView.getBitmap());
-        detectImage.extractTextFromImage(getApplicationContext(), uri);
+        detectImage.extractTextFromImage(getApplicationContext(), previewView.getBitmap());
         deleteFileByUri(uri);
         if(detectImage.getFoundText()) {
             // TODO: na stamataei kai na anoigei neo activity me to uri pou prepei na ftiaksei...

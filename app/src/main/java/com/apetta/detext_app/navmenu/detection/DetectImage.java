@@ -1,6 +1,7 @@
 package com.apetta.detext_app.navmenu.detection;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -41,7 +42,7 @@ public class DetectImage {
                     "id", "it", "lv", "lt", "ms", "mo", "pl", "pt", "ro", "sr-Latn", "sk", "sl", "es", "sv", "tr", "vi"));
     ArrayList<String> textOfBlocks, languageOfBlocks, translatedTexts;
     private boolean getIt = false;
-    private static boolean foundText = false;
+    private boolean foundText = false;
 
     public DetectImage() {
         textOfBlocks = new ArrayList<>();
@@ -50,9 +51,9 @@ public class DetectImage {
     }
 
 
-    public void extractTextFromImage(Context context, Uri uri) {
+    public void extractTextFromImage(Context context, Bitmap bitmap) {
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        try {
+//        try {
             // XRHSIMOOOOOOOOOO για text rec
 //            https://developers.google.com/ml-kit/vision/text-recognition/android#java
             // identify language
@@ -64,7 +65,8 @@ public class DetectImage {
              * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
              */
 
-            InputImage inputImage = InputImage.fromFilePath(context, uri);
+//            InputImage inputImage = InputImage.fromFilePath(context, uri);
+            InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
             Task<Text> result = recognizer.process(inputImage)
                     .addOnCompleteListener(new OnCompleteListener<Text>() {
                         @Override
@@ -90,8 +92,8 @@ public class DetectImage {
                         @Override
                         public void onFailure(@NonNull Exception e) { }
                     });
-        }
-        catch (IOException e) { e.printStackTrace(); }
+//        }
+//        catch (IOException e) { e.printStackTrace(); }
     }
 
     public void translateText() {

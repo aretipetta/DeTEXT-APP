@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import com.apetta.detext_app.R;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -138,8 +139,18 @@ public class MainDetectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), ImageResultsActivity.class);
-                intent.setData(selectedImageUri);
-                startActivity(intent);
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(selectedImageUri.toString()));
+                    ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+                    byte[] byteArray = bStream.toByteArray();
+                    intent.putExtra("bitmap", byteArray);
+//                intent.setData(selectedImageUri);
+                    startActivity(intent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -163,6 +174,7 @@ public class MainDetectionFragment extends Fragment {
     }
 
     public void askForCameraAndStoragePermission() {
+        // TODO: analoga apo poio button erxetai 8a prepei na anoigei to antistoixo otan do8ei to permission
         if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), Permissions, 1);
@@ -192,6 +204,8 @@ public class MainDetectionFragment extends Fragment {
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == RESULT_OK) {
                             Intent data = result.getData();
+                            // TODO: na mhn kanei kan save se device. Na to pernaei me bitmap mono
+                            // TODO: edw den xreiazetai, einai hdh apo8hkeumeno
                             selectedImageUri = data.getData();
                             if (selectedImageUri != null) {
                                 imgToBeDetected.setBackground(null);
@@ -218,6 +232,7 @@ public class MainDetectionFragment extends Fragment {
                             // apothikeush ths eikonas gia na apokthsei uri
                             ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
                             img.compress(Bitmap.CompressFormat.JPEG, 100, byteArray);
+                            // TODO: na mhn kanei kan save se device. Na to pernaei me bitmap mono
                             String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), img, "Image", null);
                             // twra akolouthei h idia diadikasia me prin
                             selectedImageUri = Uri.parse(path);
