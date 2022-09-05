@@ -99,6 +99,20 @@ public class CaptureVideoActivity extends CameraActivity {
                 // get bitmap from mat
                 Bitmap bitmap = matToBitmap(realMat);
                 getTextFromImage(getApplicationContext(), bitmap);
+//                DetectImage detectImage = new DetectImage();
+//                detectImage.extractTextFromImage(getApplicationContext(), bitmap);
+//                if(detectImage.getFoundText()) {
+//                    // new activity
+//                    Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
+//                    ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+//                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+//                    byte[] byteArray = bStream.toByteArray();
+//                    intent.putExtra("bitmap", byteArray);
+////                    intent.setData(uri);
+//                    startActivity(intent);
+//                    finish();
+//                }
+
 
 //                DetectImage detectImage = new DetectImage();
 //                // bitmap to uri

@@ -46,6 +46,7 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public class ImageResultsActivity extends AppCompatActivity {
 //    static DetectImage detectImage;
 
 
-    Uri imgUri;
+//    Uri imgUri;
     Bitmap imgBitmap;
     ArrayList<String> textOfBlocks;
     ArrayList<String> languageOfBlocks;
@@ -113,7 +114,8 @@ public class ImageResultsActivity extends AppCompatActivity {
         byte[] byteArray = getIntent().getByteArrayExtra("bitmap");
         imgBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 //        imgUri = getIntent().getData();
-        img.setImageURI(imgUri);
+//        img.setImageURI(imgUri);
+        img.setImageBitmap(imgBitmap);
         extractTextFromImage(imgBitmap);
         setListeners();
     }
@@ -226,27 +228,57 @@ public class ImageResultsActivity extends AppCompatActivity {
                 DatabaseReference dbRef = database.getReference("history/" + mAuth.getCurrentUser().getUid()).push();
                 String storagePath = "history/" + mAuth.getCurrentUser().getUid() + "/" + dbRef.getKey() + "img";
                 StorageReference sRef = FirebaseStorage.getInstance().getReference().child(storagePath);
-                sRef.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                // TODO: na apo8hkeuei apo bitmap anti gia file.
+                ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+                imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+                byte[] imgToBeSaved = bStream.toByteArray();
+
+                sRef.putBytes(imgToBeSaved).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // imgUri.toString(),    <- on new SavedImage...
                         dbRef.setValue(new SavedImage(storagePath,textOfBlocks, translatedTexts, languageOfBlocks, formatter.format(new Date())))
-//                        dbRef.setValue(new SavedImage(storagePath,detectImage.getTextOfBlocks(), detectImage.getTranslatedTexts(),
-//                                        detectImage.getLanguageOfBlocks(), formatter.format(new Date())))
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(ImageResultsActivity.this, "Image saved", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(ImageResultsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                Toast.makeText(ImageResultsActivity.this, "Image saved", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(ImageResultsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ImageResultsActivity.this, "Couldn't upload image.", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+//                sRef.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                        // imgUri.toString(),    <- on new SavedImage...
+//                        dbRef.setValue(new SavedImage(storagePath,textOfBlocks, translatedTexts, languageOfBlocks, formatter.format(new Date())))
+////                        dbRef.setValue(new SavedImage(storagePath,detectImage.getTextOfBlocks(), detectImage.getTranslatedTexts(),
+////                                        detectImage.getLanguageOfBlocks(), formatter.format(new Date())))
+//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                    @Override
+//                                    public void onSuccess(Void unused) {
+//                                        Toast.makeText(ImageResultsActivity.this, "Image saved", Toast.LENGTH_SHORT).show();
+//                                    }
+//                                })
+//                                .addOnFailureListener(new OnFailureListener() {
+//                                    @Override
+//                                    public void onFailure(@NonNull Exception e) {
+//                                        Toast.makeText(ImageResultsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+//                                    }
+//                                });
+//                    }
+//                });
             }
         });
     }

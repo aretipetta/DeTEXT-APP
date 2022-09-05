@@ -1,6 +1,7 @@
 package com.apetta.detext_app.navmenu.detection;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
@@ -28,6 +29,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import org.opencv.calib3d.StereoSGBM;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +44,7 @@ public class DetectImage {
                     "id", "it", "lv", "lt", "ms", "mo", "pl", "pt", "ro", "sr-Latn", "sk", "sl", "es", "sv", "tr", "vi"));
     ArrayList<String> textOfBlocks, languageOfBlocks, translatedTexts;
     private boolean getIt = false;
-    private boolean foundText = false;
+    private boolean foundText;
 
     public DetectImage() {
         textOfBlocks = new ArrayList<>();
@@ -52,48 +54,52 @@ public class DetectImage {
 
 
     public void extractTextFromImage(Context context, Bitmap bitmap) {
-        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-//        try {
-            // XRHSIMOOOOOOOOOO για text rec
+        // XRHSIMOOOOOOOOOO για text rec
 //            https://developers.google.com/ml-kit/vision/text-recognition/android#java
-            // identify language
-            // https://developers.google.com/ml-kit/language/identification/android
-            // gia translation
-            // https://developers.google.com/ml-kit/language/translation/android
-            /** TODO
-             * prwta vriskei to keimeno kai thn glwssa. An h glwssa einai egkurh prosthetei to block se mia lista.
-             * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
-             */
-
-//            InputImage inputImage = InputImage.fromFilePath(context, uri);
-            InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
-            Task<Text> result = recognizer.process(inputImage)
-                    .addOnCompleteListener(new OnCompleteListener<Text>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Text> task) {
-                            // kanei thn metafrash sthn onComplete...?
-                            Log.d("ielaaa", "mesa sthn detect....  sz = " + task.getResult().getTextBlocks().size());
-                            for(Text.TextBlock block : task.getResult().getTextBlocks()) {
-                                textOfBlocks.add(block.getText());
-                            }
-                            // edw exei parei ola ta keimena opote epistrefei th lista
-//                            getIt = true;
-                            if(textOfBlocks.size() > 0){
-                                foundText = true;
-                            }
-//                            if(textOfBlocks.size() > 0) translateText();
+        // identify language
+        // https://developers.google.com/ml-kit/language/identification/android
+        // gia translation
+        // https://developers.google.com/ml-kit/language/translation/android
+        foundText = false;
+        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+        Task<Text> result = recognizer.process(inputImage)
+                .addOnCompleteListener(new OnCompleteListener<Text>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Text> task) {
+                        // kanei thn metafrash sthn onComplete...?
+                        if(task.getResult().getTextBlocks().size() > 0) {
+                            foundText = true;
+//                            Log.d("ielaaa", "to brhke me bitmap kai size = " + task.getResult().getTextBlocks().size());
+//                            Intent intent = new Intent(context, ImageResultsActivity.class);
+//                            ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+//                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+//                            byte[] byteArray = bStream.toByteArray();
+//                            intent.putExtra("bitmap", byteArray);
+////                    intent.setData(uri);
+//                            startActivity(intent);
+//                            finish();
                         }
-                    })
-                    .addOnSuccessListener(new OnSuccessListener<Text>() {
-                        @Override
-                        public void onSuccess(Text text) { }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) { }
-                    });
+//                        for(Text.TextBlock block : task.getResult().getTextBlocks()) {
+//                            textOfBlocks.add(block.getText());
+//                        }
+//                        // edw exei parei ola ta keimena opote epistrefei th lista
+////                            getIt = true;
+//                        if(textOfBlocks.size() > 0){
+//                            foundText = true;
+//                        }
+//                            if(textOfBlocks.size() > 0) translateText();
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<Text>() {
+                    @Override
+                    public void onSuccess(Text text) { }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) { }
+                });
 //        }
-//        catch (IOException e) { e.printStackTrace(); }
     }
 
     public void translateText() {
