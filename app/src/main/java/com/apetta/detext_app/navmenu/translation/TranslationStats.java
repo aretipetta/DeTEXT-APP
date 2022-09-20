@@ -1,26 +1,33 @@
 package com.apetta.detext_app.navmenu.translation;
 
 public class TranslationStats {
-    private String location, month, sourceWord, translatedWord, sourceLang, translateLang;
 
-//    public TranslationStats() {}
+    private String country, locality, month, year, sourceWord, translatedWord, sourceLang, translateLang;
 
-    public TranslationStats(String location, String month, String sourceWord, String translatedWord, String sourceLang, String translateLang) {
-        setLocation(location);
+    public TranslationStats() {}
+
+    public TranslationStats(String country, String locality, String month, String year, String sourceWord,
+                            String translatedWord, String sourceLang, String translateLang) {
+        setCountry(country);
+        setLocality(locality);
         setMonth(month);
+        setYear(year);
         setSourceWord(sourceWord);
         setTranslatedWord(translatedWord);
         setSourceLang(sourceLang);
         setTranslateLang(translateLang);
+
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public void setCountry(String country) {this.country = country;}
+
+    public void setLocality(String locality) {this.locality = locality;}
 
     public void setMonth(String month) {
         this.month = month;
     }
+
+    public void setYear(String year) {this.year = year;}
 
     public void setSourceWord(String sourceWord) {
         this.sourceWord = sourceWord;
@@ -38,13 +45,15 @@ public class TranslationStats {
         this.translateLang = translateLang;
     }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getCountry() {return country;}
+
+    public String getLocality() {return locality;}
 
     public String getMonth() {
         return month;
     }
+
+    public String getYear() {return year;}
 
     public String getSourceWord() {
         return sourceWord;

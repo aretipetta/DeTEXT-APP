@@ -26,7 +26,7 @@ public class NavMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav_menu);
         bottomNavigationView = findViewById(R.id.bottomNavigationMenu);
-        setFragment(new MainDetectionFragment(), "Detect Image");
+        setFragment(new MainDetectionFragment(), getString(R.string.detect_img));
         setListeners();
     }
 
@@ -34,12 +34,12 @@ public class NavMenu extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if(item.toString().equals("Detect Image"))
-                    setFragment(new MainDetectionFragment(), "Detect Image");
-                else if(item.toString().equals("Translator"))
-                    setFragment(new TranslatorFragment(), "Translator");
-                else if(item.toString().equals("Account"))
-                    setFragment(new AccountFragment(), "My Account");
+                if(item.toString().equals(getString(R.string.detect_img)))
+                    setFragment(new MainDetectionFragment(), getString(R.string.detect_img));
+                else if(item.toString().equals(getString(R.string.translator)))
+                    setFragment(new TranslatorFragment(), getString(R.string.translator));
+                else if(item.toString().equals(getString(R.string.acc)))
+                    setFragment(new AccountFragment(), getString(R.string.acc));
                 return true;
             }
         });

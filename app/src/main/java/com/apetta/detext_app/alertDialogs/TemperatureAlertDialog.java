@@ -13,16 +13,16 @@ public class TemperatureAlertDialog {
     private final AlertDialog alertDialog;
 
 
-    public TemperatureAlertDialog(Context context, String temperature, String humidity) {
+    public TemperatureAlertDialog(Context context, String temperature, String location) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.temperature_alert_dialog, null);
         TextView temperatureValue = view.findViewById(R.id.temperatureValue);
         temperatureValue.setText(temperature);
         TextView locationValue = view.findViewById(R.id.locationValue);
-        locationValue.setText(humidity);
+        locationValue.setText(location);
         builder.setView(view);
         builder.setCancelable(false);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {  // context.getString(R.string.ok)
+        builder.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 alertDialog.dismiss();

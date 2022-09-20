@@ -46,8 +46,7 @@ public class MainDetectionFragment extends Fragment {
     ImageButton removeImgButton;
     private final String[] Permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final int[] requestCodes = {123, 112};
-//    private static final int cameraRequestCode = 123, storageCode = 112;
-
+    boolean hasAccessToCameraAndStorage;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -100,6 +99,7 @@ public class MainDetectionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         askForCameraAndStoragePermission();
+
         imgToBeDetected = view.findViewById(R.id.imgToBeDetected);
         openGalleryButton = view.findViewById(R.id.openGalleryButton);
         openGalleryButton.setVisibility(View.VISIBLE);
@@ -117,105 +117,81 @@ public class MainDetectionFragment extends Fragment {
     }
 
     public void setListeners() {
-        openGalleryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        openGalleryButton.setOnClickListener(v -> {
+            if(hasAccessToCameraAndStorage) {
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 resultLauncherForGallery.launch(intent);
             }
         });
 
-        openCameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                askForCameraAndStoragePermission();
+        openCameraButton.setOnClickListener(v -> {
+            if(hasAccessToCameraAndStorage) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 resultLauncherForCamera.launch(intent);
             }
         });
 
-
-        detectImgButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ImageResultsActivity.class);
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(selectedImageUri.toString()));
-                    ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
-                    byte[] byteArray = bStream.toByteArray();
-                    intent.putExtra("bitmap", byteArray);
-//                intent.setData(selectedImageUri);
-                    startActivity(intent);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        detectImgButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), ImageResultsActivity.class);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(selectedImageUri.toString()));
+                ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+                byte[] byteArray = bStream.toByteArray();
+                intent.putExtra("bitmap", byteArray);
+                startActivity(intent);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
 
-        removeImgButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedImageUri = null;
-                imgToBeDetected.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.upload_img));
-                detectImgButton.setVisibility(View.GONE);
-                openGalleryButton.setVisibility(View.VISIBLE);
-                captureFrameButton.setVisibility(View.VISIBLE);
-                openCameraButton.setVisibility(View.VISIBLE);
-                removeImgButton.setVisibility(View.GONE);
-            }
+        removeImgButton.setOnClickListener(v -> {
+            selectedImageUri = null;
+            imgToBeDetected.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_photo));
+            detectImgButton.setVisibility(View.GONE);
+            openGalleryButton.setVisibility(View.VISIBLE);
+            captureFrameButton.setVisibility(View.VISIBLE);
+            openCameraButton.setVisibility(View.VISIBLE);
+            removeImgButton.setVisibility(View.GONE);
         });
 
         captureFrameButton.setOnClickListener(view -> {
             startActivity(new Intent(getContext(), CaptureVideoActivity.class));
-//            startActivity(new Intent(getContext(), CameraXActivity.class));
         });
     }
 
     public void askForCameraAndStoragePermission() {
-        // TODO: analoga apo poio button erxetai 8a prepei na anoigei to antistoixo otan do8ei to permission
         if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), Permissions, 1);
-//            ActivityCompat.requestPermissions(getActivity(), new String[]
-//                    {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
-        else {
-//            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//            resultLauncherForCamera.launch(intent);
-        }
+        else hasAccessToCameraAndStorage = true;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            resultLauncherForCamera.launch(intent);
-        }
+        if(requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
+            hasAccessToCameraAndStorage = true;
+        else hasAccessToCameraAndStorage = false;
     }
 
     public void initResultLauncherForGallery() {
         resultLauncherForGallery = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == RESULT_OK) {
-                            Intent data = result.getData();
-                            // TODO: na mhn kanei kan save se device. Na to pernaei me bitmap mono
-                            // TODO: edw den xreiazetai, einai hdh apo8hkeumeno
-                            selectedImageUri = data.getData();
-                            if (selectedImageUri != null) {
-                                imgToBeDetected.setBackground(null);
-                                imgToBeDetected.setImageURI(selectedImageUri);
-                                detectImgButton.setVisibility(View.VISIBLE);
-                                openGalleryButton.setVisibility(View.GONE);
-                                captureFrameButton.setVisibility(View.GONE);
-                                openCameraButton.setVisibility(View.GONE);
-                                removeImgButton.setVisibility(View.VISIBLE);
-                            }
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        selectedImageUri = data.getData();
+                        if (selectedImageUri != null) {
+                            imgToBeDetected.setBackground(null);
+                            imgToBeDetected.setImageURI(selectedImageUri);
+                            detectImgButton.setVisibility(View.VISIBLE);
+                            openGalleryButton.setVisibility(View.GONE);
+                            captureFrameButton.setVisibility(View.GONE);
+                            openCameraButton.setVisibility(View.GONE);
+                            removeImgButton.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -224,33 +200,25 @@ public class MainDetectionFragment extends Fragment {
     public void initResultLauncherForCamera() {
         resultLauncherForCamera = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode() == RESULT_OK) {
-                            Bitmap img = (Bitmap) result.getData().getExtras().get("data"); // data.getExtras().get("Data");
-                            // apothikeush ths eikonas gia na apokthsei uri
-                            ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-                            img.compress(Bitmap.CompressFormat.JPEG, 100, byteArray);
-                            // TODO: na mhn kanei kan save se device. Na to pernaei me bitmap mono
-                            String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), img, "Image", null);
-                            // twra akolouthei h idia diadikasia me prin
-                            selectedImageUri = Uri.parse(path);
-                            if (selectedImageUri != null) {
-                                imgToBeDetected.setBackground(null);
-                                imgToBeDetected.setImageURI(selectedImageUri);
-                                detectImgButton.setVisibility(View.VISIBLE);
-                                openGalleryButton.setVisibility(View.GONE);
-                                captureFrameButton.setVisibility(View.GONE);
-                                openCameraButton.setVisibility(View.GONE);
-                                removeImgButton.setVisibility(View.VISIBLE);
-                            }
+                result -> {
+                    if(result.getResultCode() == RESULT_OK) {
+                        Bitmap bitmap = (Bitmap) result.getData().getExtras().get("data");
+                        // saves image locally
+                        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArray);
+                        String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, "Image", null);
+                        selectedImageUri = Uri.parse(path);
+                        if (selectedImageUri != null) {
+                            imgToBeDetected.setBackground(null);
+                            imgToBeDetected.setImageURI(selectedImageUri);
+                            detectImgButton.setVisibility(View.VISIBLE);
+                            openGalleryButton.setVisibility(View.GONE);
+                            captureFrameButton.setVisibility(View.GONE);
+                            openCameraButton.setVisibility(View.GONE);
+                            removeImgButton.setVisibility(View.VISIBLE);
                         }
                     }
                 }
         );
     }
 }
-
-// auto apo katw gia thn camera pou anixneuei ana frame ti exei klp... --> SurfaceView
-// https://developer.android.com/guide/topics/media/camera

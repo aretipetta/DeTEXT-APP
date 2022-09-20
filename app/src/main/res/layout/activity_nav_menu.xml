@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/greyBg"
     tools:context=".navmenu.NavMenu">
 
     <FrameLayout
         android:id="@+id/frameLayoutNavMenu"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/bg3"
+        android:background="@color/greyBg"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationMenu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,6 +23,8 @@
         android:id="@+id/bottomNavigationMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrim"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

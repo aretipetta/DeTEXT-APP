@@ -31,7 +31,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="15dp"
                     android:background="@drawable/rounded_button"
-                    android:text="Sign out"
+                    android:text="@string/sign_out"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -53,7 +53,7 @@
                     android:layout_marginStart="25dp"
                     android:layout_marginTop="120dp"
                     android:text="Email:"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/signOutButton" />
@@ -70,8 +70,8 @@
                     android:hint="E-mail"
                     android:inputType="textPersonName"
                     android:paddingHorizontal="10dp"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/black"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +86,7 @@
                     android:layout_marginEnd="60dp"
                     android:layout_marginBottom="140dp"
                     android:background="@drawable/rounded_button"
-                    android:text="View History"
+                    android:text="@string/view_history"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

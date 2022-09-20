@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.apetta.detext_app.R;
+import com.apetta.detext_app.alertDialogs.ProgressAlertDialog;
 import com.apetta.detext_app.navmenu.detection.SavedImage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,8 +25,9 @@ public class HistoryActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private TextView noHistoryTextView;
-    private ArrayList<SavedImage> savedImages;
+    public static ArrayList<SavedImage> savedImages;
     private RecyclerView recyclerView;
+    ProgressAlertDialog progressAlertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,8 @@ public class HistoryActivity extends AppCompatActivity {
         recyclerView.setVisibility(View.INVISIBLE);
         noHistoryTextView = findViewById(R.id.noHistoryTextView);
         noHistoryTextView.setVisibility(View.INVISIBLE);
+        progressAlertDialog = new ProgressAlertDialog(this, getString(R.string.loading));
+        progressAlertDialog.show();
         getHistoryFromDB();
     }
 
@@ -50,7 +54,6 @@ public class HistoryActivity extends AppCompatActivity {
                         for(DataSnapshot snap : snapshot.getChildren()) {
                             savedImages.add(snap.getValue(SavedImage.class));
                         }
-                        // TODO some adapters
                         if(savedImages.size() == 0) noHistoryTextView.setVisibility(View.VISIBLE);
                         else {
                             recyclerView.setVisibility(View.VISIBLE);
@@ -58,6 +61,7 @@ public class HistoryActivity extends AppCompatActivity {
                             recyclerView.setAdapter(historyAdapter);
                             recyclerView.setLayoutManager(new LinearLayoutManager(HistoryActivity.this));
                         }
+                        progressAlertDialog.dismiss();
                     }
 
                     @Override

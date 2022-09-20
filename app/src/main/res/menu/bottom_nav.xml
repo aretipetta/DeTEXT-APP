@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_item2"
-        android:title="Detect Image"
-        />
+        android:id="@+id/nav_detect_img"
+        android:title="@string/detect_img" />
     <item
-        android:id="@+id/nav_item3"
-        android:title="Translator"
-        />
+        android:id="@+id/nav_translator"
+        android:title="@string/translator" />
     <item
         android:id="@+id/nav_account"
-        android:title="Account"
-        />
+        android:title="@string/acc" />
 </menu>

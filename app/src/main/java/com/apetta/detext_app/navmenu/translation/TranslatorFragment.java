@@ -1,13 +1,25 @@
 package com.apetta.detext_app.navmenu.translation;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +31,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.apetta.detext_app.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.apetta.detext_app.alertDialogs.ProgressAlertDialog;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.mlkit.common.model.DownloadConditions;
@@ -29,7 +40,10 @@ import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,9 +60,13 @@ public class TranslatorFragment extends Fragment {
     ArrayAdapter<CharSequence> adapter;
     String[] languagesTags;
     int srcLangPosition, targetLangPosition;
-    // ta 2 prwta einai gia to translation
-    String srcLangTag, targetLangTag;
+    String srcLangTag, targetLangTag, sourceWord, translatedWord;
 
+    LocationManager locationManager;
+    LocationListener locationListener;
+    String country, locality;
+
+    ProgressAlertDialog progressAlertDialog;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -133,7 +151,6 @@ public class TranslatorFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(srcText.getText().toString().length() != 0 && !srcText.getText().toString().trim().equals("")
                         && !srcText.getText().toString().matches(".*\\d.*")) {
-//                        && !srcText.getText().toString().matches("^[0-9]$")) {
                     translateBtn.setVisibility(View.VISIBLE);
                 }
                 else translateBtn.setVisibility(View.INVISIBLE);
@@ -143,19 +160,16 @@ public class TranslatorFragment extends Fragment {
             public void afterTextChanged(Editable s) { }
         });
 
-        translateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                targetText.setText("Please, wait.");
-                translateWord();
-            }
+        translateBtn.setOnClickListener(v -> {
+            sourceWord = srcText.getText().toString();
+            targetText.setText("...");
+            translateWord();
         });
 
         dropdownSrcLang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 srcLangTag = languagesTags[position];
-                Toast.makeText(getContext(), "src lang = " + srcLangTag, Toast.LENGTH_SHORT).show();
                 srcLangPosition = position;
             }
 
@@ -176,6 +190,9 @@ public class TranslatorFragment extends Fragment {
     }
 
     public void translateWord() {
+        translateBtn.setEnabled(false);
+        progressAlertDialog = new ProgressAlertDialog(getContext(), getString(R.string.wait));
+        progressAlertDialog.show();
         TranslatorOptions options = new TranslatorOptions.Builder()
                 .setSourceLanguage(TranslateLanguage.fromLanguageTag(srcLangTag))
                 .setTargetLanguage(TranslateLanguage.fromLanguageTag(targetLangTag))
@@ -185,38 +202,80 @@ public class TranslatorFragment extends Fragment {
                 .requireWifi()
                 .build();
         translator.downloadModelIfNeeded(conditions)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        translator.translate(srcText.getText().toString())
-                                .addOnSuccessListener(new OnSuccessListener<String>() {
-                                    @Override
-                                    public void onSuccess(String s) {
-                                        targetText.setText(s);
-                                    }
-                                })
-                                .addOnFailureListener(e -> { })
-                                .addOnCompleteListener(task -> {
-                                    saveTranslationStats();
-                                });
-                    }
-                })
-                .addOnFailureListener(e -> { });
+                .addOnSuccessListener(unused -> translator.translate(sourceWord)
+                        .addOnSuccessListener(s -> translatedWord = s)
+                        .addOnFailureListener(e -> { })
+                        .addOnCompleteListener(task -> {
+                            getCountryAndLocality();
+                        }))
+                .addOnFailureListener(e -> {
+                    progressAlertDialog.dismiss();
+                    new AlertDialog.Builder(getContext())
+                            .setTitle(getString(R.string.failed))
+                            .setMessage(getString(R.string.transl_failed))
+                            .show();
+                });
     }
 
-    public void saveTranslationStats() {
-        TranslationStats translationStats = new TranslationStats("somewhere", LocalDate.now().getMonth().toString(),
-                srcText.getText().toString(), targetText.getText().toString(),
+    private void getCountryAndLocality() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
+            saveTranslationStats();
+            return;
+        }
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                country = null;
+                locality = null;
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                List<Address> addressList;
+                try {
+                    addressList = geocoder.getFromLocation(location.getLatitude(), location.getLatitude(), 1);
+                    country = addressList.get(0).getCountryName();
+                    locality = addressList.get(0).getLocality();
+                    saveTranslationStats();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {}
+
+            @Override
+            public void onProviderEnabled(String s) {}
+
+            @Override
+            public void onProviderDisabled(String s) {}
+        };
+
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            progressAlertDialog.dismiss();
+            targetText.setText(translatedWord);
+            translateBtn.setEnabled(true);
+            return;
+        }
+        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, Looper.myLooper());
+        else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, Looper.myLooper());
+    }
+
+    private void saveTranslationStats() {
+        TranslationStats translationStats = new TranslationStats(country, locality, LocalDate.now().getMonth().toString(),
+                Integer.toString(LocalDate.now().getYear()), sourceWord, translatedWord,
                 dropdownSrcLang.getSelectedItem().toString(), dropdownTargetLang.getSelectedItem().toString());
         database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference("stats/fromTranslation/");
         dbRef.push().setValue(translationStats)
                 .addOnSuccessListener(view -> {
-//                     TODO: na kanei den kserw ti apla to kitrinizw gia na kserw oti kati prepei na ftiaksw
+                    progressAlertDialog.dismiss();
+                    targetText.setText(translatedWord);
+                    translateBtn.setEnabled(true);
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {}
-                });
+                .addOnFailureListener(e -> { progressAlertDialog.dismiss(); });
     }
 }

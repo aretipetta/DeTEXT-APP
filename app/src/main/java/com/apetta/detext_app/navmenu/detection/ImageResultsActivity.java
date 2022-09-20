@@ -2,15 +2,23 @@ package com.apetta.detext_app.navmenu.detection;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apetta.detext_app.R;
+import com.apetta.detext_app.alertDialogs.ProgressAlertDialog;
+import com.apetta.detext_app.login.SignUpActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -51,24 +61,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ImageResultsActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseDatabase database;
-//    static DetectImage detectImage;
 
-
-//    Uri imgUri;
     Bitmap imgBitmap;
     ArrayList<String> textOfBlocks;
     ArrayList<String> languageOfBlocks;
     ArrayList<String> translatedTexts;
-//    ArrayList<Integer> invalidIndexes;
-//    ArrayList<Integer> validIndexes; // oi theseis tou textOfBlocks stis opoies to keimeno mporei na metafrastei
-//    final ArrayList<String> supportedLanguages =
-//        new ArrayList<>(Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.supported_languages)));
     final ArrayList<String> supportedLanguages = new ArrayList<>(
             Arrays.asList("af", "sq", "ca", "hr", "cs", "da", "nl", "en", "et", "fil", "tl", "fi", "fr", "de", "hu", "is",
                     "id", "it", "lv", "lt", "ms", "mo", "pl", "pt", "ro", "sr-Latn", "sk", "sl", "es", "sv", "tr", "vi"));
@@ -79,18 +83,14 @@ public class ImageResultsActivity extends AppCompatActivity {
     ImageView img;
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     int countBlocks;
-   // final PackageManager packageManager = getPackageManager();
-
-
-
+    ProgressAlertDialog progressAlertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_results);
-
         totalNumberOfBlocks = findViewById(R.id.totalNumberOfBlocks);
-        totalNumberOfBlocks.setText("Processing. Please, wait.");
+        totalNumberOfBlocks.setText("");
         numberOfBlock = findViewById(R.id.numberOfBlock);
         originalTextOfBlock = findViewById(R.id.originalTextOfBlock);
         translatedTextOfBlock = findViewById(R.id.translatedTextOfBlock);
@@ -113,302 +113,158 @@ public class ImageResultsActivity extends AppCompatActivity {
         // get data from intent
         byte[] byteArray = getIntent().getByteArrayExtra("bitmap");
         imgBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-//        imgUri = getIntent().getData();
-//        img.setImageURI(imgUri);
         img.setImageBitmap(imgBitmap);
         extractTextFromImage(imgBitmap);
         setListeners();
     }
 
+    /**
+     * This method sets listeners to activity's widgets
+     */
     public void setListeners() {
-        showTextsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                countBlocks = 0;
-                // στο πάτημα εμφανίζει μόνο το 1ο block
-                showTextsButton.setVisibility(View.INVISIBLE);
-                // an exei na emfanisei ki alla tote emfanizei to koympi tou epomenou
-                if(textOfBlocks.size() > 1) {
-//                if(detectImage.getTextOfBlocks().size() > 1) {
-                    nextBlockButton.setVisibility(View.VISIBLE);
-
-                }
-                showBlockDetails();
-                scrollView.setVisibility(View.VISIBLE);
-            }
+        showTextsButton.setOnClickListener(v -> {
+            countBlocks = 0;
+            // στο πάτημα εμφανίζει μόνο το 1ο block
+            showTextsButton.setVisibility(View.INVISIBLE);
+            totalNumberOfBlocks.setVisibility(View.INVISIBLE);
+            // an exei na emfanisei ki alla tote emfanizei to koympi tou epomenou
+            if(textOfBlocks.size() > 1) nextBlockButton.setVisibility(View.VISIBLE);
+            showBlockDetails();
+            scrollView.setVisibility(View.VISIBLE);
         });
 
-        previousBlockButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // prwta svhnei ta prohgoumena keimena
-                numberOfBlock.setText(null);
-                originalTextOfBlock.setText(null);
-                translatedTextOfBlock.setText(null);
-                // an to countBlocks == 0 tote prepei na eksafanistei giati den exei allo pio prin
-                countBlocks--;
-                if(countBlocks == 0) {
-                    previousBlockButton.setVisibility(View.INVISIBLE);
-                    nextBlockButton.setVisibility(View.VISIBLE);
-                }
-                if(countBlocks == textOfBlocks.size() - 2)  nextBlockButton.setVisibility(View.VISIBLE);
-//                if(countBlocks == detectImage.getTextOfBlocks().size() - 2)  nextBlockButton.setVisibility(View.VISIBLE);
-                showBlockDetails();
+        previousBlockButton.setOnClickListener(v -> {
+            // prwta svhnei ta prohgoumena keimena
+            numberOfBlock.setText(null);
+            originalTextOfBlock.setText(null);
+            translatedTextOfBlock.setText(null);
+            // an to countBlocks == 0 tote prepei na eksafanistei giati den exei allo pio prin
+            countBlocks--;
+            if(countBlocks == 0) {
+                previousBlockButton.setVisibility(View.INVISIBLE);
+                nextBlockButton.setVisibility(View.VISIBLE);
             }
+            if(countBlocks == textOfBlocks.size() - 2)  nextBlockButton.setVisibility(View.VISIBLE);
+            showBlockDetails();
         });
 
-        nextBlockButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // prwta svhnei ta prohgoumena keimena
-                numberOfBlock.setText(null);
-                originalTextOfBlock.setText(null);
-                translatedTextOfBlock.setText(null);
-                // an to countBlocks == textOfBlocks.size() tote eksafanizetai to nextButton
-                countBlocks++;
-                if(countBlocks == textOfBlocks.size() - 1) {
-//                if(countBlocks == detectImage.getTextOfBlocks().size() - 1) {
-                    nextBlockButton.setVisibility(View.INVISIBLE);
-                }
-                // sto 1 prepei na emfanistei to previous
-                if(countBlocks == 1) previousBlockButton.setVisibility(View.VISIBLE);
-                showBlockDetails();
+        nextBlockButton.setOnClickListener(v -> {
+            // prwta svhnei ta prohgoumena keimena
+            numberOfBlock.setText(null);
+            originalTextOfBlock.setText(null);
+            translatedTextOfBlock.setText(null);
+            // an to countBlocks == textOfBlocks.size() tote eksafanizetai to nextButton
+            countBlocks++;
+            if(countBlocks == textOfBlocks.size() - 1) {
+                nextBlockButton.setVisibility(View.INVISIBLE);
             }
+            // sto 1 prepei na emfanistei to previous
+            if(countBlocks == 1) previousBlockButton.setVisibility(View.VISIBLE);
+            showBlockDetails();
         });
 
-        copyOriginalText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("OriginalText", originalTextOfBlock.getText().toString());
-                clipboardManager.setPrimaryClip(clipData);
-                Toast.makeText(ImageResultsActivity.this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
-            }
+        copyOriginalText.setOnClickListener(v -> {
+            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clipData = ClipData.newPlainText("OriginalText", originalTextOfBlock.getText().toString());
+            clipboardManager.setPrimaryClip(clipData);
+            Toast.makeText(ImageResultsActivity.this, getString(R.string.copied), Toast.LENGTH_SHORT).show();
         });
 
-        copyTranslatedText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("TranslatedText", translatedTextOfBlock.getText().toString());
-                clipboardManager.setPrimaryClip(clipData);
-                Toast.makeText(ImageResultsActivity.this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
-            }
+        copyTranslatedText.setOnClickListener(v -> {
+            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clipData = ClipData.newPlainText("TranslatedText", translatedTextOfBlock.getText().toString());
+            clipboardManager.setPrimaryClip(clipData);
+            Toast.makeText(ImageResultsActivity.this, getString(R.string.copied), Toast.LENGTH_SHORT).show();
         });
 
-        fbButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAnotherAppIfExists("com.facebook", "https://www.facebook.com/");
-            }
+        fbButton.setOnClickListener(v -> openAnotherAppIfExists("com.facebook", "https://www.facebook.com/"));
+
+        instaButton.setOnClickListener(v -> openAnotherAppIfExists("com.instagram.android", "https://www.instagram.com/"));
+
+        twitterButton.setOnClickListener(v -> openAnotherAppIfExists("com.twitter.android", "https://twitter.com/"));
+
+        saveButton.setOnClickListener(v -> {
+            progressAlertDialog = new ProgressAlertDialog(this, getString(R.string.saving));
+            progressAlertDialog.show();
+            // TODO: create new object 'SavedImage' and save it to database
+            mAuth = FirebaseAuth.getInstance();
+            database = FirebaseDatabase.getInstance();
+            DatabaseReference dbRef = database.getReference("history/" + mAuth.getCurrentUser().getUid()).push();
+            String storagePath = "history/" + mAuth.getCurrentUser().getUid() + "/" + dbRef.getKey() + "img";
+            StorageReference sRef = FirebaseStorage.getInstance().getReference().child(storagePath);
+            // TODO: na apo8hkeuei apo bitmap anti gia file.
+            ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+            imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+            byte[] imgToBeSaved = bStream.toByteArray();
+            sRef.putBytes(imgToBeSaved).addOnSuccessListener(taskSnapshot -> dbRef.setValue(new SavedImage(storagePath,textOfBlocks, translatedTexts, languageOfBlocks, formatter.format(new Date())))
+                            .addOnSuccessListener(unused -> progressAlertDialog.dismiss())
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(ImageResultsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+                                progressAlertDialog.dismiss();}))
+            .addOnFailureListener(e -> {
+                Toast.makeText(ImageResultsActivity.this, getString(R.string.could_not_upload), Toast.LENGTH_SHORT).show();
+                progressAlertDialog.dismiss();
+            });
         });
+    }
 
-        instaButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAnotherAppIfExists("com.instagram.android", "https://www.instagram.com/");
-            }
-        });
-
-        twitterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAnotherAppIfExists("com.twitter.android", "https://twitter.com/");
-            }
-        });
-
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: create new object 'SavedImage' and save it to database
-                // uri to string --> uri.toString()
-                //string to uri  --> Uri.parse(str)
-                mAuth = FirebaseAuth.getInstance();
-                database = FirebaseDatabase.getInstance();
-                DatabaseReference dbRef = database.getReference("history/" + mAuth.getCurrentUser().getUid()).push();
-                String storagePath = "history/" + mAuth.getCurrentUser().getUid() + "/" + dbRef.getKey() + "img";
-                StorageReference sRef = FirebaseStorage.getInstance().getReference().child(storagePath);
-                // TODO: na apo8hkeuei apo bitmap anti gia file.
-                ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-                imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
-                byte[] imgToBeSaved = bStream.toByteArray();
-
-                sRef.putBytes(imgToBeSaved).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        dbRef.setValue(new SavedImage(storagePath,textOfBlocks, translatedTexts, languageOfBlocks, formatter.format(new Date())))
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                Toast.makeText(ImageResultsActivity.this, "Image saved", Toast.LENGTH_SHORT).show();
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(ImageResultsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
+    /**
+     * This method extracts the text from an input image. This image is passed as a bitmap
+     * @param bitmap bitmap of the input image
+     */
+    public void extractTextFromImage(Bitmap bitmap) {
+        progressAlertDialog = new ProgressAlertDialog(this, getString(R.string.wait));
+        progressAlertDialog.show();
+        textOfBlocks = new ArrayList<>();
+        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        // XRHSIMOOOOOOOOOO για text rec
+//            https://developers.google.com/ml-kit/vision/text-recognition/android#java
+        // identify language
+        // https://developers.google.com/ml-kit/language/identification/android
+        // gia translation
+        // https://developers.google.com/ml-kit/language/translation/android
+        /**
+         * prwta vriskei to keimeno kai thn glwssa. An h glwssa einai egkurh prosthetei to block se mia lista.
+         * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
+         */
+        InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+        Task<Text> result = recognizer.process(inputImage)
+                .addOnCompleteListener(task -> {
+                    textOfBlocks = new ArrayList<>();
+                    for(Text.TextBlock block : task.getResult().getTextBlocks()) {
+                        textOfBlocks.add(block.getText());
+                    }
+                    if(textOfBlocks.size() > 0) {
+                        translateText();
+                    }
+                    else {
+                        showTextsButton.setVisibility(View.INVISIBLE);
+                        totalNumberOfBlocks.setText(getString(R.string.found_nothing));
+                        progressAlertDialog.dismiss();
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ImageResultsActivity.this, "Couldn't upload image.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-//                sRef.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                        // imgUri.toString(),    <- on new SavedImage...
-//                        dbRef.setValue(new SavedImage(storagePath,textOfBlocks, translatedTexts, languageOfBlocks, formatter.format(new Date())))
-////                        dbRef.setValue(new SavedImage(storagePath,detectImage.getTextOfBlocks(), detectImage.getTranslatedTexts(),
-////                                        detectImage.getLanguageOfBlocks(), formatter.format(new Date())))
-//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void unused) {
-//                                        Toast.makeText(ImageResultsActivity.this, "Image saved", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                })
-//                                .addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        Toast.makeText(ImageResultsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                });
-//                    }
-//                });
-            }
-        });
+                .addOnSuccessListener(text -> { })
+                .addOnFailureListener(e -> { progressAlertDialog.dismiss();});
     }
 
-    public void extractTextFromImage(Bitmap bitmap) { // Uri uri
-        textOfBlocks = new ArrayList<>();
-        languageOfBlocks = new ArrayList<>();
-        translatedTexts = new ArrayList<>();
-//        DetectImage detectImage = new DetectImage();
-////        detectImage.extractTextFromImage(this, uri);
-//        detectImage.extractTextFromImage(this, bitmap);
-//        if(detectImage.getFoundText()) {
-//            detectImage.translateText();
-//            Log.d("ielaaa", "in image result... size = " + detectImage.getTextOfBlocks().size());
-//            if(detectImage.isReady()) {
-//            textOfBlocks = detectImage.getTextOfBlocks();
-//            languageOfBlocks = detectImage.getLanguageOfBlocks();
-//            translatedTexts = detectImage.getTranslatedTexts();
-//                showTextsButton.setVisibility(View.VISIBLE);
-//                totalNumberOfBlocks.setText("Press 'Show' for details.");
-//            }
-//        }
-
-
-
-
-
-        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        // TODO: edw exw vgalei to try-catch epd den xreiazetai otan to inputImage exei bitmap anti gia uri
-//        try {
-            // XRHSIMOOOOOOOOOO για text rec
-//            https://developers.google.com/ml-kit/vision/text-recognition/android#java
-            // identify language
-            // https://developers.google.com/ml-kit/language/identification/android
-            // gia translation
-            // https://developers.google.com/ml-kit/language/translation/android
-            /** TODO
-             * prwta vriskei to keimeno kai thn glwssa. An h glwssa einai egkurh prosthetei to block se mia lista.
-             * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
-             */
-//            InputImage inputImage = InputImage.fromFilePath(getApplicationContext(), uri);
-            InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
-            Task<Text> result = recognizer.process(inputImage)
-                    .addOnCompleteListener(new OnCompleteListener<Text>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Text> task) {
-                            // kanei thn metafrash sthn onComplete...?
-//                            translateText();
-
-                            textOfBlocks = new ArrayList<>();
-                            for(Text.TextBlock block : task.getResult().getTextBlocks()) {
-                                textOfBlocks.add(block.getText());
-                            }
-                            if(textOfBlocks.size() > 0) {
-                                Log.d("ielaaa", "sthn image result to vrhke me bitmap. palios kwdikas");
-                                translateText();
-                            }
-
-//                            translatedTexts = new ArrayList<>();
-//                            languageOfBlocks = new ArrayList<>();
-//                            for(int i = 0; i < textOfBlocks.size(); i++) {
-//                                translateText(textOfBlocks.get(i));
-//                            }
-                            // TODO: den douleuei touto
-//                            Toast.makeText(ImageResultsActivity.this, "translated texts size = " + translatedTexts.size(), Toast.LENGTH_SHORT).show();
-
-
-//                            textOfBlocks = new ArrayList<>();
-//                            // vriskei gia kathe block thn glwssa tou
-//                            // epd tha ta kanei ola pros ta mesa (emfwlevmena) tha prosthetei to keimeno prwta ki an den mporei na to metafrasei tha to afairei
-//                            for(Text.TextBlock block : task.getResult().getTextBlocks()) {
-//                                textOfBlocks.add(block.getText());
-//                            }
-//                            Toast.makeText(ImageResultsActivity.this, "after for loop", Toast.LENGTH_SHORT).show();
-//                            if(textOfBlocks.size() != 0) {
-//                                if(textOfBlocks.size() == 1) totalNumberOfBlocks.setText("Only one block was found");
-//                                else totalNumberOfBlocks.setText(textOfBlocks.size() + " blocks were found");
-//                                showTextsButton.setVisibility(View.VISIBLE);
-//                            }
-//                            else {
-//                                totalNumberOfBlocks.setText("No text found.");
-//                                showTextsButton.setVisibility(View.INVISIBLE);
-//                            }
-                        }
-                    })
-                    .addOnSuccessListener(new OnSuccessListener<Text>() {
-                        @Override
-                        public void onSuccess(Text text) {
-//                            textOfBlocks = new ArrayList<>();
-//                            // vriskei gia kathe block thn glwssa tou
-//                            // epd tha ta kanei ola pros ta mesa (emfwlevmena) tha prosthetei to keimeno prwta ki an den mporei na to metafrasei tha to afairei
-//                            for(Text.TextBlock block : text.getTextBlocks()) {
-//                                textOfBlocks.add(block.getText());
-//                            }
-//                            if(textOfBlocks.size() != 0) {
-//                                if(textOfBlocks.size() == 1) totalNumberOfBlocks.setText("Only one block was found");
-//                                else totalNumberOfBlocks.setText(textOfBlocks.size() + " blocks were found");
-//                                showTextsButton.setVisibility(View.VISIBLE);
-//                            }
-//                            else {
-//                                totalNumberOfBlocks.setText("No text found.");
-//                                showTextsButton.setVisibility(View.INVISIBLE);
-//                            }
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-//                            Toast.makeText(ImageResultsActivity.this, "Not found...", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
-
-
+    /**
+     * This method shows the details for every block. That means that for each block, it shows the
+     * original text of it, the language of this text and the translated text.
+     */
     public void showBlockDetails() {
-        numberOfBlock.setText("Block " + (countBlocks + 1));
+        numberOfBlock.setText(getString(R.string.block) + (countBlocks + 1));
         languageOfBlockTextView.setText(languageOfBlocks.get(countBlocks));
-        Log.d("ielaaa", "details sz = " + languageOfBlocks.size());
-//        languageOfBlockTextView.setText(detectImage.getLanguageOfBlocks().get(countBlocks));
         originalTextOfBlock.setText(textOfBlocks.get(countBlocks));
-//        originalTextOfBlock.setText(detectImage.getTextOfBlocks().get(countBlocks));
         translatedTextOfBlock.setText(translatedTexts.get(countBlocks));
-//        translatedTextOfBlock.setText(detectImage.getTranslatedTexts().get(countBlocks));
     }
 
-    // kanei metafrash kai ta krataei ola se listes
+    /**
+     * This method translates the text of all the blocks that have been detected.
+     * The list of the blocks' texts has already been set up. So, for each block's text, this method
+     * finds the language of the block's text and after that translates it to the default language
+     * which is greek. These data are stored to 2 lists, one for the language of the block's text
+     * and one for the translated text.
+     */
     public void translateText() {
         languageOfBlocks = new ArrayList<>();
         translatedTexts = new ArrayList<>();
@@ -416,90 +272,80 @@ public class ImageResultsActivity extends AppCompatActivity {
         for(int i = 0; i < textOfBlocks.size(); i++) {
             int j = i;
             languageIdentifier.identifyLanguage(textOfBlocks.get(i))
-                    .addOnSuccessListener(new OnSuccessListener<String>() {
-                        @Override
-                        public void onSuccess(String lang) {
-                            if(supportedLanguages.contains(lang)) {
-                                // uparxei kai sunexizei sth metafrash
-                                TranslatorOptions options = new TranslatorOptions.Builder()
-                                        .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
-                                        .setTargetLanguage(TranslateLanguage.GREEK)
-                                        .build();
-                                final Translator translator = Translation.getClient(options);
-                                DownloadConditions conditions = new DownloadConditions.Builder()
-                                        .requireWifi()
-                                        .build();
-                                translator.downloadModelIfNeeded(conditions)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                // Model downloaded successfully. Okay to start translating.
-                                                // (Set a flag, unhide the translation UI, etc.)
-                                                translator.translate(textOfBlocks.get(j))
-                                                        .addOnSuccessListener(new OnSuccessListener<String>() {
-                                                            @Override
-                                                            public void onSuccess(String s) {
-                                                                Toast.makeText(ImageResultsActivity.this, "ekane metafrash", Toast.LENGTH_SHORT).show();
-                                                                // edw apothikeuei to keimeno, th glwssa kai thn metafrash
-                                                                languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
-                                                                translatedTexts.add(s);
-                                                                if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                                    // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
-                                                                    showTextsButton.setVisibility(View.VISIBLE);
-                                                                    totalNumberOfBlocks.setText("Press 'Show' for details.");
-                                                                }
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-                                                                languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
-                                                                translatedTexts.add(textOfBlocks.get(j));
-                                                                if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                                    // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
-                                                                    showTextsButton.setVisibility(View.VISIBLE);
-                                                                    totalNumberOfBlocks.setText("Press 'Show' for details.");
-                                                                }
-                                                            }
-                                                        });
-                                            }
-                                        });
-                            }
-                            else {
-                                languageOfBlocks.add("Unrecognized language");
-                                translatedTexts.add(textOfBlocks.get(j));
-                                if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                    // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
-                                    showTextsButton.setVisibility(View.VISIBLE);
-                                    totalNumberOfBlocks.setText("Press 'Show' for details.");
-                                }
-                            }
+                    .addOnSuccessListener(lang -> {
+                        if(supportedLanguages.contains(lang)) {
+                            // uparxei kai sunexizei sth metafrash
+                            TranslatorOptions options = new TranslatorOptions.Builder()
+                                    .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
+                                    .setTargetLanguage(TranslateLanguage.GREEK)
+                                    .build();
+                            final Translator translator = Translation.getClient(options);
+                            DownloadConditions conditions = new DownloadConditions.Builder()
+                                    .requireWifi()
+                                    .build();
+                            translator.downloadModelIfNeeded(conditions)
+                                    .addOnSuccessListener(unused -> {
+                                        // Model downloaded successfully. Okay to start translating.
+                                        // (Set a flag, unhide the translation UI, etc.)
+                                        translator.translate(textOfBlocks.get(j))
+                                                .addOnSuccessListener(s -> {
+                                                    // edw apothikeuei to keimeno, th glwssa kai thn metafrash
+                                                    languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
+                                                    translatedTexts.add(s);
+                                                    if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                                        // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
+                                                        showTextsButton.setVisibility(View.VISIBLE);
+                                                        progressAlertDialog.dismiss();
+                                                        totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
+                                                    translatedTexts.add(textOfBlocks.get(j));
+                                                    if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                                        // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
+                                                        showTextsButton.setVisibility(View.VISIBLE);
+                                                        progressAlertDialog.dismiss();
+                                                        totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                                    }
+                                                });
+                                    });
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            languageOfBlocks.add("Unrecognized language");
+                        else {
+                            languageOfBlocks.add(getString(R.string.unrecognized));
                             translatedTexts.add(textOfBlocks.get(j));
                             if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
                                 // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
                                 showTextsButton.setVisibility(View.VISIBLE);
-                                totalNumberOfBlocks.setText("Press 'Show' for details.");
+                                progressAlertDialog.dismiss();
+                                totalNumberOfBlocks.setText(getString(R.string.for_details));
                             }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        languageOfBlocks.add(getString(R.string.unrecognized));
+                        translatedTexts.add(textOfBlocks.get(j));
+                        if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                            // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
+                            showTextsButton.setVisibility(View.VISIBLE);
+                            progressAlertDialog.dismiss();
+                            totalNumberOfBlocks.setText(getString(R.string.for_details));
                         }
                     });
         }
     }
 
-    public void openAnotherAppIfExists(String packageName, String url) {
+    /**
+     * This method tries to open an app like instagram, twitter and facebook if it exists
+     * or else the app opens on default browser
+     * @param packageName the package name of the certain app
+     * @param url the url of the certain app
+     */
+    private void openAnotherAppIfExists(String packageName, String url) {
         Uri uri = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         intent.setPackage(packageName);
-        try{
-            startActivity(intent);
-        }
-        catch(ActivityNotFoundException e) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-        }
+        try { startActivity(intent); }
+        catch(ActivityNotFoundException e) { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
     }
 }

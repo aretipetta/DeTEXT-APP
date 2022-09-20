@@ -10,16 +10,14 @@
         android:id="@+id/openCVSurface"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="gone"
-        opencv:camera_id="any"
-        android:layout_marginTop="20dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
+        android:visibility="gone"
+        opencv:camera_id="any"
+        opencv:layout_constraintBottom_toTopOf="@+id/imageButton"
         opencv:layout_constraintEnd_toEndOf="parent"
         opencv:layout_constraintStart_toStartOf="parent"
-        opencv:layout_constraintTop_toTopOf="@+id/imageView"
-        opencv:layout_constraintBottom_toTopOf="@+id/imageButton"
         opencv:show_fps="true" />
 
     <ImageButton
@@ -37,15 +35,4 @@
         opencv:layout_constraintHorizontal_bias="1.0"
         opencv:layout_constraintStart_toStartOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="149dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="192dp"
-        android:src="@drawable/load"
-        opencv:layout_constraintEnd_toEndOf="parent"
-        opencv:layout_constraintStart_toStartOf="parent"
-        opencv:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
