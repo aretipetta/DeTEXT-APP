@@ -29,7 +29,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.apetta.detext_app.R;
-import com.apetta.detext_app.alertDialogs.TemperatureAlertDialog;
+import com.apetta.detext_app.alertDialog.TemperatureAlertDialog;
 import com.apetta.detext_app.login.SignInActivity;
 import com.google.firebase.auth.FirebaseAuth;
 

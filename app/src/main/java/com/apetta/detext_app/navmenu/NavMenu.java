@@ -31,17 +31,14 @@ public class NavMenu extends AppCompatActivity {
     }
 
     public void setListeners() {
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if(item.toString().equals(getString(R.string.detect_img)))
-                    setFragment(new MainDetectionFragment(), getString(R.string.detect_img));
-                else if(item.toString().equals(getString(R.string.translator)))
-                    setFragment(new TranslatorFragment(), getString(R.string.translator));
-                else if(item.toString().equals(getString(R.string.acc)))
-                    setFragment(new AccountFragment(), getString(R.string.acc));
-                return true;
-            }
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if(item.toString().equals(getString(R.string.detect_img)))
+                setFragment(new MainDetectionFragment(), getString(R.string.detect_img));
+            else if(item.toString().equals(getString(R.string.translator)))
+                setFragment(new TranslatorFragment(), getString(R.string.translator));
+            else if(item.toString().equals(getString(R.string.acc)))
+                setFragment(new AccountFragment(), getString(R.string.acc));
+            return true;
         });
     }
 

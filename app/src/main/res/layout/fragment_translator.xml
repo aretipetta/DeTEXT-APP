@@ -7,6 +7,7 @@
     tools:context=".navmenu.translation.TranslatorFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/translatorConstrLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bg3">

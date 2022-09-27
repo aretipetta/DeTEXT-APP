@@ -1,4 +1,4 @@
-package com.apetta.detext_app.alertDialogs;
+package com.apetta.detext_app.alertDialog;
 
 import android.app.AlertDialog;
 import android.content.Context;

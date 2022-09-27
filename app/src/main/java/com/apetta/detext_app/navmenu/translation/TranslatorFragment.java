@@ -13,13 +13,13 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +28,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.apetta.detext_app.R;
-import com.apetta.detext_app.alertDialogs.ProgressAlertDialog;
+import com.apetta.detext_app.alertDialog.ProgressAlertDialog;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.mlkit.common.model.DownloadConditions;
@@ -55,6 +54,7 @@ public class TranslatorFragment extends Fragment {
     Spinner dropdownSrcLang, dropdownTargetLang;
     EditText srcText, targetText;
     Button translateBtn;
+//    ConstraintLayout translatorConstrLayout;
     FirebaseDatabase database;
 
     ArrayAdapter<CharSequence> adapter;
@@ -125,6 +125,7 @@ public class TranslatorFragment extends Fragment {
         translateBtn.setVisibility(View.INVISIBLE);
         dropdownSrcLang = view.findViewById(R.id.dropdownSrcLang);
         dropdownTargetLang = view.findViewById(R.id.dropdownTargetLang);
+//        translatorConstrLayout = view.findViewById(R.id.translatorConstrLayout);
         languagesTags = getContext().getResources().getStringArray(R.array.languages_tags);
         srcLangPosition = 0;
         targetLangPosition = 0;
@@ -265,12 +266,12 @@ public class TranslatorFragment extends Fragment {
     }
 
     private void saveTranslationStats() {
-        TranslationStats translationStats = new TranslationStats(country, locality, LocalDate.now().getMonth().toString(),
-                Integer.toString(LocalDate.now().getYear()), sourceWord, translatedWord,
+        TranslationObject translationObject = new TranslationObject(country, locality, LocalDate.now().getMonth().toString(),
+                Integer.toString(LocalDate.now().getYear()), sourceWord.toLowerCase(), translatedWord.toLowerCase(),
                 dropdownSrcLang.getSelectedItem().toString(), dropdownTargetLang.getSelectedItem().toString());
         database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference("stats/fromTranslation/");
-        dbRef.push().setValue(translationStats)
+        dbRef.push().setValue(translationObject)
                 .addOnSuccessListener(view -> {
                     progressAlertDialog.dismiss();
                     targetText.setText(translatedWord);

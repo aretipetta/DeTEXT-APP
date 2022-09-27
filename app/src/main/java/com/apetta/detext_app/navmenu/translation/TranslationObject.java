@@ -1,13 +1,13 @@
 package com.apetta.detext_app.navmenu.translation;
 
-public class TranslationStats {
+public class TranslationObject {
 
     private String country, locality, month, year, sourceWord, translatedWord, sourceLang, translateLang;
 
-    public TranslationStats() {}
+    public TranslationObject() {}
 
-    public TranslationStats(String country, String locality, String month, String year, String sourceWord,
-                            String translatedWord, String sourceLang, String translateLang) {
+    public TranslationObject(String country, String locality, String month, String year, String sourceWord,
+                             String translatedWord, String sourceLang, String translateLang) {
         setCountry(country);
         setLocality(locality);
         setMonth(month);

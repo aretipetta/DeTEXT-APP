@@ -32,7 +32,7 @@
             android:name=".navmenu.account.HistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".alertDialogs.TemperatureAlertDialog"
+            android:name=".alertDialog.TemperatureAlertDialog"
             android:exported="false" />
         <activity
             android:name=".navmenu.NavMenu"

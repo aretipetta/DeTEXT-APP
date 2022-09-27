@@ -1,6 +1,5 @@
 package com.apetta.detext_app.navmenu.account;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ActivityNotFoundException;
@@ -19,8 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apetta.detext_app.R;
-import com.apetta.detext_app.alertDialogs.ProgressAlertDialog;
-import com.apetta.detext_app.navmenu.detection.ImageResultsActivity;
+import com.apetta.detext_app.alertDialog.ProgressAlertDialog;
 import com.apetta.detext_app.navmenu.detection.SavedImage;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;

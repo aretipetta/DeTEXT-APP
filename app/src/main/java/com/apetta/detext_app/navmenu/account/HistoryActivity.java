@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.apetta.detext_app.R;
-import com.apetta.detext_app.alertDialogs.ProgressAlertDialog;
+import com.apetta.detext_app.alertDialog.ProgressAlertDialog;
 import com.apetta.detext_app.navmenu.detection.SavedImage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
