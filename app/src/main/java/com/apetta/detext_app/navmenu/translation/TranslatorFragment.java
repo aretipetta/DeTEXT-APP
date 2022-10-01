@@ -203,12 +203,17 @@ public class TranslatorFragment extends Fragment {
                 .requireWifi()
                 .build();
         translator.downloadModelIfNeeded(conditions)
-                .addOnSuccessListener(unused -> translator.translate(sourceWord)
-                        .addOnSuccessListener(s -> translatedWord = s)
-                        .addOnFailureListener(e -> { })
-                        .addOnCompleteListener(task -> {
-                            getCountryAndLocality();
-                        }))
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()) {
+                        translator.translate(sourceWord)
+                                .addOnSuccessListener(s -> translatedWord = s)
+                                .addOnFailureListener(e -> { })
+                                .addOnCompleteListener(task1 -> {
+                                    getCountryAndLocality();
+                                });
+                    }
+                })
+                .addOnSuccessListener(unused -> { })
                 .addOnFailureListener(e -> {
                     progressAlertDialog.dismiss();
                     new AlertDialog.Builder(getContext())
@@ -272,11 +277,14 @@ public class TranslatorFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference("stats/fromTranslation/");
         dbRef.push().setValue(translationObject)
-                .addOnSuccessListener(view -> {
-                    progressAlertDialog.dismiss();
-                    targetText.setText(translatedWord);
-                    translateBtn.setEnabled(true);
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()) {
+                        progressAlertDialog.dismiss();
+                        targetText.setText(translatedWord);
+                        translateBtn.setEnabled(true);
+                    }
                 })
+                .addOnSuccessListener(view -> { })
                 .addOnFailureListener(e -> { progressAlertDialog.dismiss(); });
     }
 }

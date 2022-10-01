@@ -73,12 +73,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         SavedImage savedImage = savedImages.get(position);
         String imgPath = savedImage.getStoragePath();
         StorageReference sRef = FirebaseStorage.getInstance().getReference().child(imgPath);
-        sRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
-            if(!imgsMap.containsKey(imgPath))
-                imgsMap.put(imgPath, BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-            holder.imgHistoryRow.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-            holder.dateHistoryRow.setText(savedImage.getDate());
-        });
+        sRef.getBytes(Long.MAX_VALUE)
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()) {
+                        byte[] bytes = task.getResult();
+                        if(!imgsMap.containsKey(imgPath))
+                            imgsMap.put(imgPath, BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                        holder.imgHistoryRow.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                        holder.dateHistoryRow.setText(savedImage.getDate());
+                    }
+                })
+                .addOnSuccessListener(bytes -> { });
 
         // onClickListener to start new Activity with card's details
         holder.cardLayout.setOnClickListener(view -> {
@@ -92,30 +97,33 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             progressAlertDialog.show();
             mAuth = FirebaseAuth.getInstance();
             database = FirebaseDatabase.getInstance();
-            String path = savedImage.getStoragePath().substring(0, savedImage.getStoragePath().length() - 3);
+            String path = savedImage.getStoragePath();
             DatabaseReference dbRef = database.getReference(path);
             dbRef.removeValue()
-                    .addOnSuccessListener(unused1 -> {
-                        progressAlertDialog.dismiss();
-                        StorageReference storageRef = FirebaseStorage.getInstance().getReference(savedImage.getStoragePath());
-                        storageRef.delete().addOnSuccessListener(unused -> {
-                            Toast.makeText(context, context.getString(R.string.removed), Toast.LENGTH_SHORT).show();
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
                             progressAlertDialog.dismiss();
-                        })
-                        .addOnCompleteListener(task -> { });
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference(savedImage.getStoragePath());
+                            storageRef.delete().addOnSuccessListener(unused -> {
+                                        Toast.makeText(context, context.getString(R.string.removed), Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
+                                        progressAlertDialog.dismiss();
+                                    })
+                                    .addOnCompleteListener(task1 -> {
+                                        HistoryActivity.savedImages.remove(position);
+                                        Activity activity = (Activity) context;
+                                        activity.recreate();
+                                    });
+                        }
                     })
+                    .addOnSuccessListener(unused1 -> { })
                     .addOnFailureListener(e1 -> {
                         progressAlertDialog.dismiss();
                         Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
                     })
-                    .addOnCompleteListener(task1 -> {
-                        HistoryActivity.savedImages.remove(position);
-                        Activity activity = (Activity) context;
-                        activity.recreate();
-                    });
+                    .addOnCompleteListener(task1 -> { });
         });
     }
 

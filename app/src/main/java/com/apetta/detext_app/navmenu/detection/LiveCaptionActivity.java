@@ -1,29 +1,21 @@
 package com.apetta.detext_app.navmenu.detection;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.view.SurfaceView;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+
 import com.apetta.detext_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
-
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Looper;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.SurfaceView;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraActivity;
@@ -32,17 +24,13 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
-import org.opencv.core.CvException;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
 
-public class CaptureVideoActivity extends CameraActivity {
+public class LiveCaptionActivity extends CameraActivity {
 
     private int count_frames;  // counter for frames. detection will be applied every 10 frames
 
@@ -67,7 +55,7 @@ public class CaptureVideoActivity extends CameraActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_capture_video);
+        setContentView(R.layout.activity_live_caption);
         openCVCameraView = findViewById(R.id.openCVSurface);
         openCVCameraView.setVisibility(SurfaceView.VISIBLE);
         openCVCameraView.setCvCameraViewListener(cameraViewListener2);
@@ -117,7 +105,6 @@ public class CaptureVideoActivity extends CameraActivity {
      * @return bitmap converted by mat
      */
     public Bitmap matToBitmap(Mat mat) {
-        Mat imgSource = mat;
         final Mat rgba = mat;
         final Bitmap bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rgba, bitmap, true);
@@ -144,18 +131,15 @@ public class CaptureVideoActivity extends CameraActivity {
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
         Task<Text> result = recognizer.process(inputImage)
-                .addOnCompleteListener(new OnCompleteListener<Text>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Text> task) {
-                        if(task.getResult().getTextBlocks().size() > 0) {
-                            Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
-                            ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
-                            byte[] byteArray = bStream.toByteArray();
-                            intent.putExtra("bitmap", byteArray);
-                            startActivity(intent);
-                            finish();
-                        }
+                .addOnCompleteListener(task -> {
+                    if(task.getResult().getTextBlocks().size() > 0) {
+                        Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
+                        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+                        byte[] byteArray = bStream.toByteArray();
+                        intent.putExtra("bitmap", byteArray);
+                        startActivity(intent);
+                        finish();
                     }
                 })
                 .addOnSuccessListener(text -> { })

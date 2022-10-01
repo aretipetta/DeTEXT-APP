@@ -13,6 +13,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.apetta.detext_app.alertDialog.ProgressAlertDialog;
 import com.apetta.detext_app.navmenu.NavMenu;
@@ -25,6 +26,7 @@ public class SignInActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> resultLauncher;
     Button signInBtn;
     EditText email, password;
+    ImageView signUpGIF;
     static Activity thisActivity;
 
 
@@ -45,6 +47,7 @@ public class SignInActivity extends AppCompatActivity {
         signInBtn.setEnabled(false);
         email = findViewById(R.id.emailSignIn);
         password = findViewById(R.id.passwordSignIn);
+        signUpGIF = findViewById(R.id.signUpGIF);
         setListeners();
     }
 
@@ -84,23 +87,18 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) { }
         });
+
+        signUpGIF.setOnClickListener(view -> { startActivity(new Intent(SignInActivity.this, SignUpActivity.class)); });
     }
 
     /* user can't sign in if the required fields are empty */
     private void checkTextChange() {
         if (email.getText().toString().trim().length() != 0 && password.getText().toString().length() != 0) {
             signInBtn.setEnabled(true);
-//            signInBtn.setBackgroundColor(ContextCompat.getColor(SignInActivity.this, R.color.bg_btn));
         }
         else {
             signInBtn.setEnabled(false);
-//            signInBtn.setBackgroundColor(ContextCompat.getColor(SignInActivity.this, R.color.bg_btn_disabled));
         }
-    }
-
-    /* Move to another activity to sign up */
-    public void goToSignUp(View view) {
-        startActivity(new Intent(SignInActivity.this, SignUpActivity.class));
     }
 
     public void signIn(View view) {

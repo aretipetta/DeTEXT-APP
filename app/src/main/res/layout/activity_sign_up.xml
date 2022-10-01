@@ -11,6 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -23,7 +24,7 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="50dp"
-                android:layout_marginTop="70dp"
+                android:layout_marginTop="30dp"
                 android:layout_marginEnd="50dp"
                 android:background="@drawable/plain_text_sign_in"
                 android:drawableRight="@drawable/ic_email"
@@ -35,14 +36,14 @@
                 android:textColorHint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/signInText" />
+                app:layout_constraintTop_toBottomOf="@+id/imgviewProfilePicSignUp" />
 
             <Button
                 android:id="@+id/signUpButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="150dp"
                 android:background="@drawable/rounded_button"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
@@ -59,7 +60,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="80dp"
+                android:layout_marginTop="50dp"
                 android:layout_marginEnd="20dp"
                 android:text="@string/create_acc"
                 android:textAlignment="center"
@@ -109,6 +110,17 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/passwordSignUp" />
+
+            <ImageView
+                android:id="@+id/imgviewProfilePicSignUp"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="50dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/signInText"
+                app:srcCompat="@drawable/prfl" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

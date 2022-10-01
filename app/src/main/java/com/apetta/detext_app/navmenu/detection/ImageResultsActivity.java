@@ -1,5 +1,6 @@
 package com.apetta.detext_app.navmenu.detection;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ActivityNotFoundException;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 
 import com.apetta.detext_app.R;
 import com.apetta.detext_app.alertDialog.ProgressAlertDialog;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -169,21 +172,25 @@ public class ImageResultsActivity extends AppCompatActivity {
         saveButton.setOnClickListener(v -> {
             progressAlertDialog = new ProgressAlertDialog(this, getString(R.string.saving));
             progressAlertDialog.show();
-            // TODO: create new object 'SavedImage' and save it to database
             mAuth = FirebaseAuth.getInstance();
             database = FirebaseDatabase.getInstance();
             DatabaseReference dbRef = database.getReference("history/" + mAuth.getCurrentUser().getUid()).push();
-            String storagePath = "history/" + mAuth.getCurrentUser().getUid() + "/" + dbRef.getKey() + "img";
+            String storagePath = "history/" + mAuth.getCurrentUser().getUid() + "/" + dbRef.getKey();
             StorageReference sRef = FirebaseStorage.getInstance().getReference().child(storagePath);
-            // TODO: na apo8hkeuei apo bitmap anti gia file.
             ByteArrayOutputStream bStream = new ByteArrayOutputStream();
             imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
             byte[] imgToBeSaved = bStream.toByteArray();
-            sRef.putBytes(imgToBeSaved).addOnSuccessListener(taskSnapshot -> dbRef.setValue(new SavedImage(storagePath,textOfBlocks, translatedTexts, languageOfBlocks, formatter.format(new Date())))
-                            .addOnSuccessListener(unused -> progressAlertDialog.dismiss())
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(ImageResultsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
-                                progressAlertDialog.dismiss();}))
+            sRef.putBytes(imgToBeSaved)
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()) {
+                            dbRef.setValue(new SavedImage(storagePath,textOfBlocks, translatedTexts, languageOfBlocks, formatter.format(new Date())))
+                                    .addOnSuccessListener(unused -> progressAlertDialog.dismiss())
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(ImageResultsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+                                        progressAlertDialog.dismiss();});
+                        }
+                    })
+                    .addOnSuccessListener(taskSnapshot -> { })
             .addOnFailureListener(e -> {
                 Toast.makeText(ImageResultsActivity.this, getString(R.string.could_not_upload), Toast.LENGTH_SHORT).show();
                 progressAlertDialog.dismiss();
@@ -255,56 +262,67 @@ public class ImageResultsActivity extends AppCompatActivity {
         for(int i = 0; i < textOfBlocks.size(); i++) {
             int j = i;
             languageIdentifier.identifyLanguage(textOfBlocks.get(i))
-                    .addOnSuccessListener(lang -> {
-                        if(supportedLanguages.contains(lang)) {
-                            // uparxei kai sunexizei sth metafrash
-                            TranslatorOptions options = new TranslatorOptions.Builder()
-                                    .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
-                                    .setTargetLanguage(TranslateLanguage.GREEK)
-                                    .build();
-                            final Translator translator = Translation.getClient(options);
-                            DownloadConditions conditions = new DownloadConditions.Builder()
-                                    .requireWifi()
-                                    .build();
-                            translator.downloadModelIfNeeded(conditions)
-                                    .addOnSuccessListener(unused -> {
-                                        // Model downloaded successfully. Okay to start translating.
-                                        // (Set a flag, unhide the translation UI, etc.)
-                                        translator.translate(textOfBlocks.get(j))
-                                                .addOnSuccessListener(s -> {
-                                                    // edw apothikeuei to keimeno, th glwssa kai thn metafrash
-                                                    languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
-                                                    translatedTexts.add(s);
-                                                    if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                        // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
-                                                        showTextsButton.setVisibility(View.VISIBLE);
-                                                        progressAlertDialog.dismiss();
-                                                        totalNumberOfBlocks.setText(getString(R.string.for_details));
-                                                    }
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
-                                                    translatedTexts.add(textOfBlocks.get(j));
-                                                    if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                        // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
-                                                        showTextsButton.setVisibility(View.VISIBLE);
-                                                        progressAlertDialog.dismiss();
-                                                        totalNumberOfBlocks.setText(getString(R.string.for_details));
-                                                    }
-                                                });
-                                    });
-                        }
-                        else {
-                            languageOfBlocks.add(getString(R.string.unrecognized));
-                            translatedTexts.add(textOfBlocks.get(j));
-                            if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
-                                showTextsButton.setVisibility(View.VISIBLE);
-                                progressAlertDialog.dismiss();
-                                totalNumberOfBlocks.setText(getString(R.string.for_details));
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()) {
+                            String lang = task.getResult();
+                            if(supportedLanguages.contains(lang)) {
+                                // uparxei kai sunexizei sth metafrash
+                                TranslatorOptions options = new TranslatorOptions.Builder()
+                                        .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
+                                        .setTargetLanguage(TranslateLanguage.GREEK)
+                                        .build();
+                                final Translator translator = Translation.getClient(options);
+                                DownloadConditions conditions = new DownloadConditions.Builder()
+                                        .requireWifi()
+                                        .build();
+                                translator.downloadModelIfNeeded(conditions)
+                                        .addOnCompleteListener(task1 -> {
+                                            if (task1.isSuccessful()){
+                                                // Model downloaded successfully. Okay to start translating.
+                                                // (Set a flag, unhide the translation UI, etc.)
+                                                translator.translate(textOfBlocks.get(j))
+                                                        .addOnCompleteListener(task2 -> {
+                                                            if(task2.isSuccessful()) {
+                                                                String s = task2.getResult();
+                                                                // edw apothikeuei to keimeno, th glwssa kai thn metafrash
+                                                                languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
+                                                                translatedTexts.add(s);
+                                                                if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                                                    // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
+                                                                    showTextsButton.setVisibility(View.VISIBLE);
+                                                                    progressAlertDialog.dismiss();
+                                                                    totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                                                }
+                                                            }
+                                                        })
+                                                        .addOnSuccessListener(s -> { })
+                                                        .addOnFailureListener(e -> {
+                                                            languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
+                                                            translatedTexts.add(textOfBlocks.get(j));
+                                                            if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                                                // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
+                                                                showTextsButton.setVisibility(View.VISIBLE);
+                                                                progressAlertDialog.dismiss();
+                                                                totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                                            }
+                                                        });
+                                            }
+                                        })
+                                        .addOnSuccessListener(unused -> { });
+                            }
+                            else {
+                                languageOfBlocks.add(getString(R.string.unrecognized));
+                                translatedTexts.add(textOfBlocks.get(j));
+                                if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                    // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
+                                    showTextsButton.setVisibility(View.VISIBLE);
+                                    progressAlertDialog.dismiss();
+                                    totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                }
                             }
                         }
                     })
+                    .addOnSuccessListener(lang -> { })
                     .addOnFailureListener(e -> {
                         languageOfBlocks.add(getString(R.string.unrecognized));
                         translatedTexts.add(textOfBlocks.get(j));

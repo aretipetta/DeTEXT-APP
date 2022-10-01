@@ -9,8 +9,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -157,7 +155,7 @@ public class MainDetectionFragment extends Fragment {
         });
 
         captureFrameButton.setOnClickListener(view -> {
-            startActivity(new Intent(getContext(), CaptureVideoActivity.class));
+            startActivity(new Intent(getContext(), LiveCaptionActivity.class));
         });
     }
 

@@ -2,7 +2,7 @@
     <string name="app_name">DeTEXT App</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_up">Sign up</string>
-    <string name="or_sign_up">or Sign up</string>
+    <string name="or_sign_up">or</string>
     <string name="signing_in">Signing in…</string>
     <string name="error">Error</string>
     <string name="create_acc">Create new account</string>
@@ -21,7 +21,7 @@
     <string name="detect_img">Detect Image</string>
     <string name="open_gallery">Open gallery</string>
     <string name="open_camera">Open camera</string>
-    <string name="live_camera">Live capture</string>
+    <string name="live_camera">Live caption</string>
     <string name="sign_out">Sign out</string>
     <string name="view_history">View history</string>
     <string name="not_available">Not available</string>

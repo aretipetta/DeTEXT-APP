@@ -116,15 +116,20 @@ public class DetailsOfCardHistoryActivity extends AppCompatActivity {
         imgsMap = new HashMap<>();
         String imgPath = savedImage.getStoragePath();
         StorageReference sRef = FirebaseStorage.getInstance().getReference().child(imgPath);
-        sRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
-            if(!imgsMap.containsKey(imgPath))
-                imgsMap.put(imgPath, BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-            image.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-            date.setText(savedImage.getDate());
-            if(savedImage.getSourceBlocks().size() > 1) nextButton.setVisibility(View.VISIBLE);
-            progressAlertDialog.dismiss();
-            showDetailsOfBlock();
-        });
+        sRef.getBytes(Long.MAX_VALUE)
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()) {
+                        byte[] bytes = task.getResult();
+                        if(!imgsMap.containsKey(imgPath))
+                            imgsMap.put(imgPath, BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                        image.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                        date.setText(savedImage.getDate());
+                        if(savedImage.getSourceBlocks().size() > 1) nextButton.setVisibility(View.VISIBLE);
+                        progressAlertDialog.dismiss();
+                        showDetailsOfBlock();
+                    }
+                })
+                .addOnSuccessListener(bytes -> { });
     }
 
     /**

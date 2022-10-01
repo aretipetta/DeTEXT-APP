@@ -3,7 +3,7 @@
     <string name="app_name">DeTEXT App</string>
     <string name="sign_in">Σύνδεση</string>
     <string name="sign_up">Εγγραφή</string>
-    <string name="or_sign_up">ή Εγγραφή</string>
+    <string name="or_sign_up">ή</string>
     <string name="signing_in">Σύνδεση…</string>
     <string name="error">Σφάλμα</string>
     <string name="create_acc">Νέος λογαριασμός</string>

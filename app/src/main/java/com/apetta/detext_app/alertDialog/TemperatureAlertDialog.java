@@ -12,7 +12,6 @@ import com.apetta.detext_app.R;
 public class TemperatureAlertDialog {
     private final AlertDialog alertDialog;
 
-
     public TemperatureAlertDialog(Context context, String temperature, String location) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.temperature_alert_dialog, null);

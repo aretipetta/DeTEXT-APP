@@ -22,11 +22,15 @@
     <color name="colorPrimVar">#204060</color>
     <color name="bg">#52527a</color>
     <color name="bg2">#47476b</color>
-    <color name="bg3">#00284d</color>
+    <color name="bg3">#004280</color>
+<!--    #00284d-->
 <!--    <color name="bg3">#e6e6ff</color>-->
     <color name="grey">#DCDCDC</color>
     <color name="textBorder">#767676</color>
-    <color name="textBlue">#5A6AF0</color>
+    <color name="textBlue">#7380f2</color>
+<!--    #5A6AF0-->
+<!--    <color name="bgTextColor">#a366ff</color>-->
+    <color name="bgTextColor">#FFFFFFFF</color>
     <color name="txtBlue">#00284d</color>
     <color name="dropdownBG">#004280</color>
     <color name="greyBg">#d9d9d9</color>
