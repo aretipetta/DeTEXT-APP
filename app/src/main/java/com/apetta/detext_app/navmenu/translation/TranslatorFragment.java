@@ -11,9 +11,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -28,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.apetta.detext_app.R;
 import com.apetta.detext_app.alertDialog.ProgressAlertDialog;
@@ -54,13 +56,15 @@ public class TranslatorFragment extends Fragment {
     Spinner dropdownSrcLang, dropdownTargetLang;
     EditText srcText, targetText;
     Button translateBtn;
-//    ConstraintLayout translatorConstrLayout;
     FirebaseDatabase database;
 
     ArrayAdapter<CharSequence> adapter;
     String[] languagesTags;
     int srcLangPosition, targetLangPosition;
     String srcLangTag, targetLangTag, sourceWord, translatedWord;
+
+    ActivityResultLauncher<String> launcherForPermission;
+    boolean hasPermission;
 
     LocationManager locationManager;
     LocationListener locationListener;
@@ -119,13 +123,15 @@ public class TranslatorFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initResultLauncherForPermission();
+        launcherForPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+
         srcText = view.findViewById(R.id.srcText);
         targetText = view.findViewById(R.id.targetText);
         translateBtn = view.findViewById(R.id.translateButton);
         translateBtn.setVisibility(View.INVISIBLE);
         dropdownSrcLang = view.findViewById(R.id.dropdownSrcLang);
         dropdownTargetLang = view.findViewById(R.id.dropdownTargetLang);
-//        translatorConstrLayout = view.findViewById(R.id.translatorConstrLayout);
         languagesTags = getContext().getResources().getStringArray(R.array.languages_tags);
         srcLangPosition = 0;
         targetLangPosition = 0;
@@ -286,5 +292,14 @@ public class TranslatorFragment extends Fragment {
                 })
                 .addOnSuccessListener(view -> { })
                 .addOnFailureListener(e -> { progressAlertDialog.dismiss(); });
+    }
+
+    public void initResultLauncherForPermission() {
+        launcherForPermission = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                result -> {
+                    if(result) hasPermission = true;
+                    else hasPermission = false;
+                });
     }
 }

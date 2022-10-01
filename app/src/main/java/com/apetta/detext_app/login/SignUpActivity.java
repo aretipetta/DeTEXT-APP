@@ -83,14 +83,8 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void checkTextChange() {
         if (email.getText().toString().trim().length() != 0 && password.getText().toString().length() != 0
-        && confirmPassword.getText().length() != 0) {
-            signUpBtn.setEnabled(true);
-//            signUpBtn.setBackgroundColor(ContextCompat.getColor(SignUpActivity.this, R.color.bg_btn));
-        }
-        else {
-            signUpBtn.setEnabled(false);
-//            signUpBtn.setBackgroundColor(ContextCompat.getColor(SignUpActivity.this, R.color.bg_btn_disabled));
-        }
+        && confirmPassword.getText().length() != 0)  signUpBtn.setEnabled(true);
+        else signUpBtn.setEnabled(false);
     }
 
     public void signUp(View view) {
@@ -100,7 +94,6 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(this, getApplicationContext().getString(R.string.invalid_pass), Toast.LENGTH_SHORT).show();
             return;
         }
-        // an einai idia ta passwords
         mAuth.createUserWithEmailAndPassword(email.getText().toString().trim(), password.getText().toString())
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()) createUser();
@@ -109,11 +102,9 @@ public class SignUpActivity extends AppCompatActivity {
                         String errorMessage;
                         try {
                             errorMessage = task.getException().getLocalizedMessage();
-                            // tts.setMessage(errorMessage);
                         }
                         catch (NullPointerException e) {
                             errorMessage = "Error description is not available.";
-                            //tts.setMessage(getString(R.string.sthWentWrong));
                         }
                         new AlertDialog.Builder(SignUpActivity.this)
                                 .setTitle(getString(R.string.error))

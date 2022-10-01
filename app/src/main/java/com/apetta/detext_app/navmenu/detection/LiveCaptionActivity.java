@@ -72,13 +72,11 @@ public class LiveCaptionActivity extends CameraActivity {
 
         @Override
         public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-            // opws deixnei katw sto stackoverflow
-            // https://stackoverflow.com/questions/44579822/convert-opencv-mat-to-android-bitmap
             /*checks for text every 10 frames*/
             if(count_frames == 10){
                 Mat realMat = rotateFrame(inputFrame.rgba());   // rotate mat
                 Bitmap bitmap = matToBitmap(realMat);   // get bitmap from mat
-                getTextFromImage(getApplicationContext(), bitmap);
+                getTextFromImage(bitmap);
                 count_frames = 0;
                 return inputFrame.rgba();
             }
@@ -112,22 +110,10 @@ public class LiveCaptionActivity extends CameraActivity {
     }
 
     /**
-     *
-     * @param context
+     * Redirect to new activity if any text is found on image
      * @param bitmap
      */
-    public void getTextFromImage(Context context, Bitmap bitmap) {
-        // XRHSIMOOOOOOOOOO για text rec
-//            https://developers.google.com/ml-kit/vision/text-recognition/android#java
-        // identify language
-        // https://developers.google.com/ml-kit/language/identification/android
-        // gia translation
-        // https://developers.google.com/ml-kit/language/translation/android
-        /** TODO
-         * prwta vriskei to keimeno kai thn glwssa. An h glwssa einai egkurh prosthetei to block se mia lista.
-         * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
-         */
-
+    public void getTextFromImage(Bitmap bitmap) {
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
         Task<Text> result = recognizer.process(inputImage)

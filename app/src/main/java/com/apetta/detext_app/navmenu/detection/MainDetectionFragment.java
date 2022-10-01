@@ -18,12 +18,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.apetta.detext_app.R;
 
@@ -40,9 +42,11 @@ public class MainDetectionFragment extends Fragment {
     ImageView imgToBeDetected;
     Uri selectedImageUri;
     ActivityResultLauncher<Intent> resultLauncherForGallery, resultLauncherForCamera;
+    ActivityResultLauncher<String[]> launcherForPermissions;
     Button openGalleryButton, detectImgButton, openCameraButton, captureFrameButton;
     ImageButton removeImgButton;
-    private final String[] Permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private final String[] Permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION};
     private final int[] requestCodes = {123, 112};
     boolean hasAccessToCameraAndStorage;
 
@@ -96,7 +100,8 @@ public class MainDetectionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        askForCameraAndStoragePermission();
+        initResultLauncherForPermissions();
+        launcherForPermissions.launch(Permissions);
 
         imgToBeDetected = view.findViewById(R.id.imgToBeDetected);
         openGalleryButton = view.findViewById(R.id.openGalleryButton);
@@ -120,6 +125,7 @@ public class MainDetectionFragment extends Fragment {
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 resultLauncherForGallery.launch(intent);
             }
+            else Toast.makeText(getContext(), "Permission denied. You can change the permission from settings.", Toast.LENGTH_SHORT).show();
         });
 
         openCameraButton.setOnClickListener(v -> {
@@ -127,6 +133,7 @@ public class MainDetectionFragment extends Fragment {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 resultLauncherForCamera.launch(intent);
             }
+            else Toast.makeText(getContext(), "Permission denied. You can change the permission from settings.", Toast.LENGTH_SHORT).show();
         });
 
         detectImgButton.setOnClickListener(v -> {
@@ -159,20 +166,14 @@ public class MainDetectionFragment extends Fragment {
         });
     }
 
-    public void askForCameraAndStoragePermission() {
-        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), Permissions, 1);
-        }
-        else hasAccessToCameraAndStorage = true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
-            hasAccessToCameraAndStorage = true;
-        else hasAccessToCameraAndStorage = false;
+    public void initResultLauncherForPermissions() {
+        launcherForPermissions = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    if(result.get(Manifest.permission.CAMERA) && result.get(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                        hasAccessToCameraAndStorage = true;
+                    else hasAccessToCameraAndStorage = false;
+                });
     }
 
     public void initResultLauncherForGallery() {

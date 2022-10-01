@@ -114,11 +114,9 @@ public class SignInActivity extends AppCompatActivity {
                         String errorMessage;
                         try {
                             errorMessage = task.getException().getLocalizedMessage();
-                            // tts.setMessage(errorMessage);
                         }
                         catch (NullPointerException e) {
                             errorMessage = "Error description is not available.";
-                            //tts.setMessage(getString(R.string.sthWentWrong));
                         }
                         new AlertDialog.Builder(SignInActivity.this)
                                 .setTitle(getString(R.string.error))

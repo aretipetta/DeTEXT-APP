@@ -12,6 +12,12 @@ import com.apetta.detext_app.R;
 public class TemperatureAlertDialog {
     private final AlertDialog alertDialog;
 
+    /**
+     *
+     * @param context The context of the application.
+     * @param temperature The temperature that is found by the sensor
+     * @param location The location (county and locality) that is found by GPS
+     */
     public TemperatureAlertDialog(Context context, String temperature, String location) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.temperature_alert_dialog, null);

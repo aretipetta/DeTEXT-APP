@@ -13,8 +13,11 @@ public class ProgressAlertDialog {
     private final AlertDialog alertDialog;
     private final TextView textView;
 
-    // context: The context of the application.
-    // message: The message of the alert dialog that will be displayed.
+    /**
+     *
+     * @param context The context of the application.
+     * @param message The message of the alert dialog that will be displayed.
+     */
     public ProgressAlertDialog(Context context, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.progress_alert_dialog, null);

@@ -104,7 +104,6 @@ public class AccountFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // just like onCreate method
         mAuth = FirebaseAuth.getInstance();
 
         signOutButton = view.findViewById(R.id.signOutButton);

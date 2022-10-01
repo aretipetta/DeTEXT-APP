@@ -110,21 +110,17 @@ public class ImageResultsActivity extends AppCompatActivity {
     public void setListeners() {
         showTextsButton.setOnClickListener(v -> {
             countBlocks = 0;
-            // στο πάτημα εμφανίζει μόνο το 1ο block
             showTextsButton.setVisibility(View.INVISIBLE);
             totalNumberOfBlocks.setVisibility(View.INVISIBLE);
-            // an exei na emfanisei ki alla tote emfanizei to koympi tou epomenou
             if(textOfBlocks.size() > 1) nextBlockButton.setVisibility(View.VISIBLE);
             showBlockDetails();
             scrollView.setVisibility(View.VISIBLE);
         });
 
         previousBlockButton.setOnClickListener(v -> {
-            // prwta svhnei ta prohgoumena keimena
             numberOfBlock.setText(null);
             originalTextOfBlock.setText(null);
             translatedTextOfBlock.setText(null);
-            // an to countBlocks == 0 tote prepei na eksafanistei giati den exei allo pio prin
             countBlocks--;
             if(countBlocks == 0) {
                 previousBlockButton.setVisibility(View.INVISIBLE);
@@ -135,16 +131,13 @@ public class ImageResultsActivity extends AppCompatActivity {
         });
 
         nextBlockButton.setOnClickListener(v -> {
-            // prwta svhnei ta prohgoumena keimena
             numberOfBlock.setText(null);
             originalTextOfBlock.setText(null);
             translatedTextOfBlock.setText(null);
-            // an to countBlocks == textOfBlocks.size() tote eksafanizetai to nextButton
             countBlocks++;
             if(countBlocks == textOfBlocks.size() - 1) {
                 nextBlockButton.setVisibility(View.INVISIBLE);
             }
-            // sto 1 prepei na emfanistei to previous
             if(countBlocks == 1) previousBlockButton.setVisibility(View.VISIBLE);
             showBlockDetails();
         });
@@ -207,16 +200,6 @@ public class ImageResultsActivity extends AppCompatActivity {
         progressAlertDialog.show();
         textOfBlocks = new ArrayList<>();
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        // XRHSIMOOOOOOOOOO για text rec
-//            https://developers.google.com/ml-kit/vision/text-recognition/android#java
-        // identify language
-        // https://developers.google.com/ml-kit/language/identification/android
-        // gia translation
-        // https://developers.google.com/ml-kit/language/translation/android
-        /**
-         * prwta vriskei to keimeno kai thn glwssa. An h glwssa einai egkurh prosthetei to block se mia lista.
-         * Sto telos, afou mazepsei ola ta blocks, kanei thn metafrash gia to kathena
-         */
         InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
         Task<Text> result = recognizer.process(inputImage)
                 .addOnCompleteListener(task -> {
@@ -266,7 +249,6 @@ public class ImageResultsActivity extends AppCompatActivity {
                         if(task.isSuccessful()) {
                             String lang = task.getResult();
                             if(supportedLanguages.contains(lang)) {
-                                // uparxei kai sunexizei sth metafrash
                                 TranslatorOptions options = new TranslatorOptions.Builder()
                                         .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
                                         .setTargetLanguage(TranslateLanguage.GREEK)
@@ -284,11 +266,9 @@ public class ImageResultsActivity extends AppCompatActivity {
                                                         .addOnCompleteListener(task2 -> {
                                                             if(task2.isSuccessful()) {
                                                                 String s = task2.getResult();
-                                                                // edw apothikeuei to keimeno, th glwssa kai thn metafrash
                                                                 languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
                                                                 translatedTexts.add(s);
                                                                 if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                                    // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
                                                                     showTextsButton.setVisibility(View.VISIBLE);
                                                                     progressAlertDialog.dismiss();
                                                                     totalNumberOfBlocks.setText(getString(R.string.for_details));
@@ -300,7 +280,6 @@ public class ImageResultsActivity extends AppCompatActivity {
                                                             languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
                                                             translatedTexts.add(textOfBlocks.get(j));
                                                             if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                                // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
                                                                 showTextsButton.setVisibility(View.VISIBLE);
                                                                 progressAlertDialog.dismiss();
                                                                 totalNumberOfBlocks.setText(getString(R.string.for_details));
@@ -314,7 +293,6 @@ public class ImageResultsActivity extends AppCompatActivity {
                                 languageOfBlocks.add(getString(R.string.unrecognized));
                                 translatedTexts.add(textOfBlocks.get(j));
                                 if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                    // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
                                     showTextsButton.setVisibility(View.VISIBLE);
                                     progressAlertDialog.dismiss();
                                     totalNumberOfBlocks.setText(getString(R.string.for_details));
@@ -327,7 +305,6 @@ public class ImageResultsActivity extends AppCompatActivity {
                         languageOfBlocks.add(getString(R.string.unrecognized));
                         translatedTexts.add(textOfBlocks.get(j));
                         if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                            // mono tote tha emfanistei to koumpi gia thn emfanish apotelesmatwn
                             showTextsButton.setVisibility(View.VISIBLE);
                             progressAlertDialog.dismiss();
                             totalNumberOfBlocks.setText(getString(R.string.for_details));
