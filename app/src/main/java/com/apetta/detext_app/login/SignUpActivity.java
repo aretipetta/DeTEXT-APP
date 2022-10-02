@@ -88,12 +88,12 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     public void signUp(View view) {
-        progressAlertDialog = new ProgressAlertDialog(SignUpActivity.this, getString(R.string.signing_up));
-        progressAlertDialog.show();
         if(!password.getText().toString().equals(confirmPassword.getText().toString())) {
             Toast.makeText(this, getApplicationContext().getString(R.string.invalid_pass), Toast.LENGTH_SHORT).show();
             return;
         }
+        progressAlertDialog = new ProgressAlertDialog(SignUpActivity.this, getString(R.string.signing_up));
+        progressAlertDialog.show();
         mAuth.createUserWithEmailAndPassword(email.getText().toString().trim(), password.getText().toString())
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()) createUser();

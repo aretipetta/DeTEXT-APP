@@ -36,6 +36,15 @@ dependencies {
     // text recognition
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:18.0.0'
 
+    // to fix error about text recognition and downloading
+//    // ML Kit dependencies
+//    implementation 'com.google.firebase:firebase-ml-vision'
+//// Barcode detection model.
+//    implementation 'com.google.firebase:firebase-ml-vision-barcode-model:16.0.2'
+//    implementation 'com.google.firebase:firebase-ml-model-interpreter'
+
+
+
     // language identity
     implementation 'com.google.mlkit:language-id:17.0.3'
 

@@ -1,15 +1,13 @@
 package com.apetta.detext_app.navmenu.detection;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceView;
-
-import androidx.annotation.NonNull;
+import android.widget.ImageView;
 
 import com.apetta.detext_app.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
@@ -24,7 +22,9 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
+import org.opencv.core.CvException;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
@@ -33,6 +33,8 @@ import java.util.List;
 public class LiveCaptionActivity extends CameraActivity {
 
     private int count_frames;  // counter for frames. detection will be applied every 10 frames
+
+    ImageView imageview;
 
     private CameraBridgeViewBase openCVCameraView;
     
@@ -60,6 +62,7 @@ public class LiveCaptionActivity extends CameraActivity {
         openCVCameraView.setVisibility(SurfaceView.VISIBLE);
         openCVCameraView.setCvCameraViewListener(cameraViewListener2);
         count_frames = 0;
+        imageview = findViewById(R.id.imageView);
     }
 
 
@@ -76,6 +79,16 @@ public class LiveCaptionActivity extends CameraActivity {
             if(count_frames == 10){
                 Mat realMat = rotateFrame(inputFrame.rgba());   // rotate mat
                 Bitmap bitmap = matToBitmap(realMat);   // get bitmap from mat
+//                runOnUiThread(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        imageview.setImageBitmap(bitmap);
+//                        // Stuff that updates the UI
+//
+//                    }
+//                });
+
                 getTextFromImage(bitmap);
                 count_frames = 0;
                 return inputFrame.rgba();
@@ -103,10 +116,23 @@ public class LiveCaptionActivity extends CameraActivity {
      * @return bitmap converted by mat
      */
     public Bitmap matToBitmap(Mat mat) {
-        final Mat rgba = mat;
-        final Bitmap bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(rgba, bitmap, true);
-        return bitmap;
+        Bitmap btmp = null;
+        Mat rgb = new Mat();
+        Imgproc.cvtColor(mat, rgb, Imgproc.COLOR_BGR2RGB);
+        try{
+            btmp = Bitmap.createBitmap(rgb.cols(), rgb.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(rgb, btmp);
+        }
+        catch (CvException e) {
+            Log.d("Exception", e.getMessage());
+        }
+        return btmp;
+
+//        final Mat rgba = mat;
+//        final Bitmap bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(rgba, bitmap, true);
+//        Log.d("twra", "mallon to ekane bitmap");
+//        return bitmap;
     }
 
     /**
@@ -114,22 +140,31 @@ public class LiveCaptionActivity extends CameraActivity {
      * @param bitmap
      */
     public void getTextFromImage(Bitmap bitmap) {
+        //todo mallon ton bitmap exei 8ema
+        Log.d("twra", "mesa sthn getText");
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
         Task<Text> result = recognizer.process(inputImage)
                 .addOnCompleteListener(task -> {
-                    if(task.getResult().getTextBlocks().size() > 0) {
-                        Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
-                        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
-                        byte[] byteArray = bStream.toByteArray();
-                        intent.putExtra("bitmap", byteArray);
-                        startActivity(intent);
-                        finish();
+                    Log.d("twra", "mesa sthn onComplete");
+
+                    if(task.isSuccessful()) {
+                        Log.d("twra", "mesa sthn successful ths onComplete");
+//                        Intent intent = new Intent(getApplicationContext(), ImageResultsActivity.class);
+//                        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+//                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
+//                        byte[] byteArray = bStream.toByteArray();
+//                        intent.putExtra("bitmap", byteArray);
+//                        startActivity(intent);
+//                        finish();
                     }
                 })
-                .addOnSuccessListener(text -> { })
-                .addOnFailureListener(e -> { });
+                .addOnSuccessListener(text -> {
+                    if(text.getTextBlocks().size() > 0) {
+                        Log.d("twra", "ela kai to vrike");
+                    }
+                })
+                .addOnFailureListener(e -> { Log.d("twra", "gamietai kai message = " + e.getMessage()); });
     }
 
     @Override

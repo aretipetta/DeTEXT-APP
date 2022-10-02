@@ -29,7 +29,10 @@
     "intermediatesFolder": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp\\OpenCVLibrary460\\build\\intermediates\\cxx\\Debug\\216r462b",
     "isDebuggableEnabled": true,
     "validAbiList": [
-      "X86"
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
     ],
     "buildTargetSet": [
       "opencv_jni_shared"
@@ -130,7 +133,6 @@
         "rootBuildGradleFolder": "C:\\Users\\areti\\Documents\\my_projects\\projects\\androidStudio\\DeTEXTApp",
         "sdkFolder": "C:\\Users\\areti\\AppData\\Local\\Android\\Sdk",
         "isBuildOnlyTargetAbiEnabled": true,
-        "ideBuildTargetAbi": "x86",
         "isCmakeBuildCohabitationEnabled": false,
         "isPrefabEnabled": false
       },
