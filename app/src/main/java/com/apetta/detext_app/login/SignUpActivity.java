@@ -118,7 +118,9 @@ public class SignUpActivity extends AppCompatActivity {
         User user = new User(email.getText().toString().trim());
         database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef =database.getReference("users/" + mAuth.getCurrentUser().getUid());
-        dbRef.setValue(user).addOnSuccessListener(unused -> askForLocationPermission());
+        dbRef.setValue(user).addOnSuccessListener(unused -> {
+            askForLocationPermission();
+        });
     }
 
     private void askForLocationPermission() {

@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -196,15 +197,20 @@ public class ImageResultsActivity extends AppCompatActivity {
      * @param bitmap bitmap of the input image
      */
     public void extractTextFromImage(Bitmap bitmap) {
+        Log.d("twra", "mesa sthn extract text");
         progressAlertDialog = new ProgressAlertDialog(this, getString(R.string.wait));
         progressAlertDialog.show();
         textOfBlocks = new ArrayList<>();
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
         Task<Text> result = recognizer.process(inputImage)
-                .addOnCompleteListener(task -> {
+//                .addOnCompleteListener(task -> {
+//
+//                })
+                .addOnSuccessListener(text -> {
+                    Log.d("twra", "vrhke to text");
                     textOfBlocks = new ArrayList<>();
-                    for(Text.TextBlock block : task.getResult().getTextBlocks()) {
+                    for(Text.TextBlock block : text.getTextBlocks()) {
                         textOfBlocks.add(block.getText());
                     }
                     if(textOfBlocks.size() > 0) {
@@ -216,8 +222,10 @@ public class ImageResultsActivity extends AppCompatActivity {
                         progressAlertDialog.dismiss();
                     }
                 })
-                .addOnSuccessListener(text -> { })
-                .addOnFailureListener(e -> { progressAlertDialog.dismiss();});
+                .addOnFailureListener(e -> {
+                    Log.d("twra", "apetuxe to extraction");
+                    progressAlertDialog.dismiss();
+                });
     }
 
     /**
@@ -239,68 +247,76 @@ public class ImageResultsActivity extends AppCompatActivity {
      * and one for the translated text.
      */
     public void translateText() {
+        Log.d("twra", "sthn translate");
         languageOfBlocks = new ArrayList<>();
         translatedTexts = new ArrayList<>();
         LanguageIdentifier languageIdentifier = LanguageIdentification.getClient();
         for(int i = 0; i < textOfBlocks.size(); i++) {
             int j = i;
             languageIdentifier.identifyLanguage(textOfBlocks.get(i))
-                    .addOnCompleteListener(task -> {
-                        if(task.isSuccessful()) {
-                            String lang = task.getResult();
-                            if(supportedLanguages.contains(lang)) {
-                                TranslatorOptions options = new TranslatorOptions.Builder()
-                                        .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
-                                        .setTargetLanguage(TranslateLanguage.GREEK)
-                                        .build();
-                                final Translator translator = Translation.getClient(options);
-                                DownloadConditions conditions = new DownloadConditions.Builder()
-                                        .requireWifi()
-                                        .build();
-                                translator.downloadModelIfNeeded(conditions)
-                                        .addOnCompleteListener(task1 -> {
-                                            if (task1.isSuccessful()){
-                                                // Model downloaded successfully. Okay to start translating.
-                                                // (Set a flag, unhide the translation UI, etc.)
-                                                translator.translate(textOfBlocks.get(j))
-                                                        .addOnCompleteListener(task2 -> {
-                                                            if(task2.isSuccessful()) {
-                                                                String s = task2.getResult();
-                                                                languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
-                                                                translatedTexts.add(s);
-                                                                if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                                    showTextsButton.setVisibility(View.VISIBLE);
-                                                                    progressAlertDialog.dismiss();
-                                                                    totalNumberOfBlocks.setText(getString(R.string.for_details));
-                                                                }
-                                                            }
-                                                        })
-                                                        .addOnSuccessListener(s -> { })
-                                                        .addOnFailureListener(e -> {
-                                                            languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
-                                                            translatedTexts.add(textOfBlocks.get(j));
-                                                            if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                                                showTextsButton.setVisibility(View.VISIBLE);
-                                                                progressAlertDialog.dismiss();
-                                                                totalNumberOfBlocks.setText(getString(R.string.for_details));
-                                                            }
-                                                        });
-                                            }
-                                        })
-                                        .addOnSuccessListener(unused -> { });
-                            }
-                            else {
-                                languageOfBlocks.add(getString(R.string.unrecognized));
-                                translatedTexts.add(textOfBlocks.get(j));
-                                if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
-                                    showTextsButton.setVisibility(View.VISIBLE);
-                                    progressAlertDialog.dismiss();
-                                    totalNumberOfBlocks.setText(getString(R.string.for_details));
-                                }
+//                    .addOnCompleteListener(task -> {
+//                    })
+                    .addOnSuccessListener(lang -> {
+//                        String lang = task.getResult();
+                        Log.d("twra", "vrhke th glwssa");
+                        if(supportedLanguages.contains(lang)) {
+                            TranslatorOptions options = new TranslatorOptions.Builder()
+                                    .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
+                                    .setTargetLanguage(TranslateLanguage.GREEK)
+                                    .build();
+                            final Translator translator = Translation.getClient(options);
+                            DownloadConditions conditions = new DownloadConditions.Builder()
+                                    .requireWifi()
+                                    .build();
+                            translator.downloadModelIfNeeded(conditions)
+//                                        .addOnCompleteListener(task1 -> {
+//                                        })
+                                    .addOnSuccessListener(unused -> {
+                                        // Model downloaded successfully. Okay to start translating.
+                                        // (Set a flag, unhide the translation UI, etc.)
+                                        translator.translate(textOfBlocks.get(j))
+//                                                .addOnCompleteListener(task2 -> {
+//                                                })
+                                                .addOnSuccessListener(s -> {
+                                                    Log.d("twra", "ekane metafrash");
+                                                    languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
+                                                    translatedTexts.add(s);
+                                                    if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                                        showTextsButton.setVisibility(View.VISIBLE);
+                                                        progressAlertDialog.dismiss();
+                                                        totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
+                                                    translatedTexts.add(textOfBlocks.get(j));
+                                                    if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                                        showTextsButton.setVisibility(View.VISIBLE);
+                                                        progressAlertDialog.dismiss();
+                                                        totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                                    }
+                                                });
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        languageOfBlocks.add(getString(R.string.unrecognized));
+                                        translatedTexts.add(textOfBlocks.get(j));
+                                        if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                            showTextsButton.setVisibility(View.VISIBLE);
+                                            progressAlertDialog.dismiss();
+                                            totalNumberOfBlocks.setText(getString(R.string.for_details));
+                                        }
+                                    });
+                        }
+                        else {
+                            languageOfBlocks.add(getString(R.string.unrecognized));
+                            translatedTexts.add(textOfBlocks.get(j));
+                            if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
+                                showTextsButton.setVisibility(View.VISIBLE);
+                                progressAlertDialog.dismiss();
+                                totalNumberOfBlocks.setText(getString(R.string.for_details));
                             }
                         }
                     })
-                    .addOnSuccessListener(lang -> { })
                     .addOnFailureListener(e -> {
                         languageOfBlocks.add(getString(R.string.unrecognized));
                         translatedTexts.add(textOfBlocks.get(j));
