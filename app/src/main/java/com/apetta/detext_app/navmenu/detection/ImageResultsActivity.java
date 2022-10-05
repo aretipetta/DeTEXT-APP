@@ -197,7 +197,6 @@ public class ImageResultsActivity extends AppCompatActivity {
      * @param bitmap bitmap of the input image
      */
     public void extractTextFromImage(Bitmap bitmap) {
-        Log.d("twra", "mesa sthn extract text");
         progressAlertDialog = new ProgressAlertDialog(this, getString(R.string.wait));
         progressAlertDialog.show();
         textOfBlocks = new ArrayList<>();
@@ -208,7 +207,6 @@ public class ImageResultsActivity extends AppCompatActivity {
 //
 //                })
                 .addOnSuccessListener(text -> {
-                    Log.d("twra", "vrhke to text");
                     textOfBlocks = new ArrayList<>();
                     for(Text.TextBlock block : text.getTextBlocks()) {
                         textOfBlocks.add(block.getText());
@@ -223,7 +221,6 @@ public class ImageResultsActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.d("twra", "apetuxe to extraction");
                     progressAlertDialog.dismiss();
                 });
     }
@@ -247,18 +244,13 @@ public class ImageResultsActivity extends AppCompatActivity {
      * and one for the translated text.
      */
     public void translateText() {
-        Log.d("twra", "sthn translate");
         languageOfBlocks = new ArrayList<>();
         translatedTexts = new ArrayList<>();
         LanguageIdentifier languageIdentifier = LanguageIdentification.getClient();
         for(int i = 0; i < textOfBlocks.size(); i++) {
             int j = i;
             languageIdentifier.identifyLanguage(textOfBlocks.get(i))
-//                    .addOnCompleteListener(task -> {
-//                    })
                     .addOnSuccessListener(lang -> {
-//                        String lang = task.getResult();
-                        Log.d("twra", "vrhke th glwssa");
                         if(supportedLanguages.contains(lang)) {
                             TranslatorOptions options = new TranslatorOptions.Builder()
                                     .setSourceLanguage(TranslateLanguage.fromLanguageTag(lang))
@@ -269,16 +261,11 @@ public class ImageResultsActivity extends AppCompatActivity {
                                     .requireWifi()
                                     .build();
                             translator.downloadModelIfNeeded(conditions)
-//                                        .addOnCompleteListener(task1 -> {
-//                                        })
                                     .addOnSuccessListener(unused -> {
                                         // Model downloaded successfully. Okay to start translating.
                                         // (Set a flag, unhide the translation UI, etc.)
                                         translator.translate(textOfBlocks.get(j))
-//                                                .addOnCompleteListener(task2 -> {
-//                                                })
                                                 .addOnSuccessListener(s -> {
-                                                    Log.d("twra", "ekane metafrash");
                                                     languageOfBlocks.add(Locale.forLanguageTag(lang).getDisplayLanguage());
                                                     translatedTexts.add(s);
                                                     if(languageOfBlocks.size() == textOfBlocks.size() && textOfBlocks.size() == translatedTexts.size()) {
